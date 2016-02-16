@@ -101,3 +101,8 @@ void Scene::setEye(Triple e)
 {
     eye = e;
 }
+
+void Scene::setRenderMode(int r)
+{
+    renderMode = r;
+}

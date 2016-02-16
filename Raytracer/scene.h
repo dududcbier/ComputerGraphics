@@ -29,12 +29,14 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
+    int renderMode;
 public:
     Color trace(const Ray &ray);
     void render(Image &img);
     void addObject(Object *o);
     void addLight(Light *l);
     void setEye(Triple e);
+    void setRenderMode(int r);
     unsigned int getNumObjects() { return objects.size(); }
     unsigned int getNumLights() { return lights.size(); }
 };

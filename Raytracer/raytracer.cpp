@@ -44,6 +44,26 @@ Triple parseTriple(const YAML::Node& node)
     return t;
 }
 
+int parseRenderMode(const YAML::Node& node)
+{
+
+    std::string s = "";
+    node.GetScalar(s);
+
+    if (s == "zbuffer") {
+        cout << "Render Mode: 1 (zbuffer)" << endl; 
+        return 1;
+    }
+
+    if (s == "normal") {
+        cout << "Render Mode: 2 (normal)" << endl; 
+        return 2; 
+    }
+    
+    cout << "Render Mode: 0 (Phong)" << endl;
+    return 0;
+}
+
 Material* Raytracer::parseMaterial(const YAML::Node& node)
 {
     Material *m = new Material();
@@ -108,6 +128,14 @@ bool Raytracer::readScene(const std::string& inputFilename)
             YAML::Node doc;
             parser.GetNextDocument(doc);
 
+            // RenderMode
+            try {
+                scene->setRenderMode(parseRenderMode(doc["RenderMode"]));
+            }
+            catch(const YAML::KeyNotFound e){
+                scene->setRenderMode(0);
+            }
+            
             // Read scene configuration options
             scene->setEye(parseTriple(doc["Eye"]));
 
