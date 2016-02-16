@@ -33,9 +33,9 @@ private:
     double maxDepth;
     double minDepth;
 public:
-    Color trace(const Ray &ray);
-    Color traceNormal(const Ray &ray);
-    Color traceZbuffer(const Ray &ray);
+    Color trace(const Ray &ray);       // tracer corresponds to the rendering in Phong mode
+    Color traceNormal(const Ray &ray); // traceNormal corresponds to the rendering in normal mode
+    Color traceZbuffer(const Ray &ray);  // traceZbuffer corresponds to the rendering in zbuffer mode
     void render(Image &img);
     void addObject(Object *o);
     void addLight(Light *l);

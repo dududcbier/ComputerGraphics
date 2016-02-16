@@ -63,6 +63,11 @@ int parseRenderMode(const YAML::Node& node)
         return 2; 
     }
     
+    if (s == "phong") {
+        cout << "Render Mode: 0 (Phong)" << endl; 
+        return 0; 
+    }
+    
     cout << "Render Mode: 0 (Phong)" << endl;
     return 0;
 }
@@ -93,7 +98,7 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         returnObject = sphere;
     }
 
-    if (objectType == "triangle") {
+    if (objectType == "triangle") { // Triangles are defined by three different points
         Point p1, p2, p3;
         node["p1"] >> p1;
         node["p2"] >> p2;
@@ -102,7 +107,7 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         returnObject = triangle;
     }
     
-    if (objectType == "plane") {
+    if (objectType == "plane") { // Planes are defined by a point and 2 linearly independent vectors
         Point p;
         Vector v1, v2;
         node["p"] >> p;

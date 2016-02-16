@@ -10,8 +10,8 @@ Hit Triangle::intersect(const Ray &ray)
 	* RT1.1: INTERSECTION CALCULATION
 	****************************************************/
 	
-	double a, b, c, d, e, f, g, h, i, j, k, l;
-
+	double a, b, c, d, e, f, g, h, i, j, k, l; // These are the variables used as described in the book to calculate the intersection. We're using them to make the code more readable.
+	
 	a = p1.x - p2.x;
 	b = p1.y - p2.y;
 	c = p1.z - p2.z;
@@ -34,6 +34,8 @@ Hit Triangle::intersect(const Ray &ray)
 	double ak_jb = a * k - j * b;
 	double jc_al = j * c - a * l;
 	double bl_kc = b * l - k * c;
+	
+	// Basically what we do is solve a system of 3 equations, using Cramer's Rule, to determine gamma, beta and t
 
 	double M     = a * (ei_hf) + b * (gf_di) + c * (dh_eg);
 
