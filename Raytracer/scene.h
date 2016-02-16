@@ -32,6 +32,8 @@ private:
     int renderMode;
 public:
     Color trace(const Ray &ray);
+    Color traceNormal(const Ray &ray);
+    Color traceZbuffer(const Ray &ray);
     void render(Image &img);
     void addObject(Object *o);
     void addLight(Light *l);
