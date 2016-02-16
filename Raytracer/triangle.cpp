@@ -44,14 +44,17 @@ Hit Triangle::intersect(const Ray &ray)
 	double a, b, c, d, e, f, g, h, i, j, k, l;
 
 	a = p1.x - p2.x;
-	b = p1.x - p3.x;
-	c = ray.D.x;
-	d = p1.y - p2.y;
+	b = p1.y - p2.y;
+	c = p1.z - p2.z;
+
+	d = p1.x - p3.x;
 	e = p1.y - p3.y;
-	f = ray.D.y;
-	g = p1.z - p2.z;
-	h = p1.z - p3.z;
+	f = p1.z - p3.z;
+	
+	g = ray.D.x;
+	h = ray.D.y;
 	i = ray.D.z;
+
 	j = p1.x - ray.O.x;
 	k = p1.y - ray.O.y;
 	l = p1.z - ray.O.z;
@@ -63,12 +66,11 @@ Hit Triangle::intersect(const Ray &ray)
 	double jc_al = j * c - a * l;
 	double bl_kc = b * l - k * c;
 
-	double M     = a * (ei_hf) + b * (gf_di) + c *(dh_eg);
+	double M     = a * (ei_hf) + b * (gf_di) + c * (dh_eg);
 
 	double gamma = (i * (ak_jb) + h * (jc_al) + g * (bl_kc)) / M;
 
-	if (gamma > 1 || gamma < 0) {
-		cout << "G - " << gamma << endl;
+	if (gamma < 0 || gamma > 1) {
 		return Hit::NO_HIT();
 	}
 

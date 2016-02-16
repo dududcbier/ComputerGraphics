@@ -15,16 +15,49 @@
 Eye: [200, 200, 1000]  
 
 Lights:
-- position: [-1000, 600, 500]
+- position: [-200, 600, 500]
   color: [1.0,1.0,1.0]
 
 Objects:
 - type: triangle
-  p1: [140, 320, 100]
+  p1: [-140, 320, 100]
   p2: [90, 370, 100]
   p3: [90, 320, 150]
   material: # blue
-    color: [1.0,1.0,1.0]
+    color: [1.0,0.0,1.0]
+    ka: 0.2
+    kd: 0.7
+    ks: 0.5
+    n: 64
+
+- type: triangle
+  p1: [30, 520, 50]
+  p2: [90, 233, 153]
+  p3: [32, 100, 200]
+  material: # blue
+    color: [1.0,0.0,1.0]
+    ka: 0.2
+    kd: 0.7
+    ks: 0.5
+    n: 64
+
+- type: triangle
+  p1: [-53, 340, -100]
+  p2: [34, -440, 100]
+  p3: [300, 230, 150]
+  material: # blue
+    color: [1.0,0.0,1.0]
+    ka: 0.2
+    kd: 0.7
+    ks: 0.5
+    n: 64
+
+- type: triangle
+  p1: [-140, 320, 100]
+  p2: [90, 370, 100]
+  p3: [90, 320, 150]
+  material: # blue
+    color: [1.0,0.0,1.0]
     ka: 0.2
     kd: 0.7
     ks: 0.5

@@ -12,16 +12,16 @@
 #  The example scene description should largely speak for itself. By now
 #  it should be clear that the #-character can be used to insert comments.
 
-Eye: [10,1,10]  
+Eye: [130,50,100]  
 
 Lights:
-- position: [20,20,0]
+- position: [20,20,100]
   color: [1.0,1.0,1.0]
 
 Objects:
 - type: sphere
-  position: [3,3,3]
-  radius: 5
+  position: [130,160,-100]
+  radius: 80
   material: # blue
     color: [0.0,0.0,1.0]
     ka: 0.2
