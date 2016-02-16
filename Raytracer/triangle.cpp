@@ -77,7 +77,6 @@ Hit Triangle::intersect(const Ray &ray)
 	double beta  = (j * (ei_hf) + k * (gf_di) + l * (dh_eg)) / M;
 
 	if (beta < 0 || beta > 1 - gamma){
-		cout << "Beta" << endl;
 		return Hit::NO_HIT();
 	}
 

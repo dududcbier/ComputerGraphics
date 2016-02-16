@@ -96,8 +96,7 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         node["p1"] >> p1;
         node["p2"] >> p2;
         node["p3"] >> p3;
-        Triangle *triangle = new Triangle(p1, p2, p3); 
-        cout << "Read triangle: " << p1 << p2 << p3 << endl;    
+        Triangle *triangle = new Triangle(p1, p2, p3);     
         returnObject = triangle;
     }
 

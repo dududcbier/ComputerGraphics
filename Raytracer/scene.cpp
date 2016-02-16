@@ -32,7 +32,6 @@ Color Scene::trace(const Ray &ray)
 
     // No hit? Return background color.
     if (!obj) return Color(0.0, 0.0, 0.0);
-    else cout << "Hit!" << endl;
 
     Material *material = obj->material;            //the hit objects material
     Point hit = ray.at(min_hit.t);                 //the hit point
