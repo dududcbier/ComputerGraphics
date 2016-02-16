@@ -17,6 +17,19 @@
 #include "scene.h"
 #include "material.h"
 
+void Scene::minMaxDepth(const Ray &ray){
+    Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
+    Object *obj = NULL;
+    for (unsigned int i = 0; i < objects.size(); ++i) {
+        Hit hit(objects[i]->intersect(ray));
+        if (hit.t<min_hit.t) {
+            min_hit = hit;
+            obj = objects[i];
+        }
+    }    
+
+}
+
 Color Scene::trace(const Ray &ray)
 {
     // Find hit object and distance
@@ -168,8 +181,15 @@ void Scene::render(Image &img)
             if (renderMode == 0) // Phong
                 col = trace(ray);
             else {
-                if (renderMode == 1) // z-buffer
+                if (renderMode == 1){ // z-buffer
+                    for (int j = 0; j < h; j++){
+                        for (i = 0; i < w; w++){
+                            Ray ray2(eye, (pixel-eye).normalized());
+                            minMaxDepth(ray2);
+                        }
+                    }
                     col = traceZbuffer(ray);
+                }
 
                 else col = traceNormal(ray); // normal
             }
