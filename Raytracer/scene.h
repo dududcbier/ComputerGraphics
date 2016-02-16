@@ -30,6 +30,8 @@ private:
     std::vector<Light*> lights;
     Triple eye;
     int renderMode;
+    double maxDepth;
+    double minDepth;
 public:
     Color trace(const Ray &ray);
     Color traceNormal(const Ray &ray);
@@ -39,8 +41,11 @@ public:
     void addLight(Light *l);
     void setEye(Triple e);
     void setRenderMode(int r);
+    void minMaxDepth(const Ray &ray);
     unsigned int getNumObjects() { return objects.size(); }
     unsigned int getNumLights() { return lights.size(); }
+    void setMaxDepth(double x);
+    void setMinDepth(double x);
 };
 
 #endif /* end of include guard: SCENE_H_KNBLQLP6 */

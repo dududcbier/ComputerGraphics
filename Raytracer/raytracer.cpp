@@ -16,6 +16,7 @@
 #include "object.h"
 #include "sphere.h"
 #include "triangle.h"
+#include "plane.h"
 #include "material.h"
 #include "light.h"
 #include "image.h"
@@ -23,6 +24,7 @@
 #include <ctype.h>
 #include <fstream>
 #include <assert.h>
+
 
 // Functions to ease reading from YAML input
 void operator >> (const YAML::Node& node, Triple& t);
@@ -98,6 +100,16 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         node["p3"] >> p3;
         Triangle *triangle = new Triangle(p1, p2, p3);     
         returnObject = triangle;
+    }
+    
+    if (objectType == "plane") {
+        Point p;
+        Vector v1, v2;
+        node["p"] >> p;
+        node["v1"] >> v1;
+        node["v2"] >> v2;
+        Plane *plane = new Plane(p, v1, v2);     
+        returnObject = plane;
     }
 
     if (returnObject) {
