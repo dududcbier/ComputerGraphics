@@ -15,6 +15,7 @@
 #include "raytracer.h"
 #include "object.h"
 #include "sphere.h"
+#include "triangle.h"
 #include "material.h"
 #include "light.h"
 #include "image.h"
@@ -90,6 +91,16 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         returnObject = sphere;
     }
 
+    if (objectType == "triangle") {
+        Point p1, p2, p3;
+        node["p1"] >> p1;
+        node["p2"] >> p2;
+        node["p3"] >> p3;
+        Triangle *triangle = new Triangle(p1, p2, p3); 
+        cout << "Read triangle: " << p1 << p2 << p3 << endl;    
+        returnObject = triangle;
+    }
+
     if (returnObject) {
         // read the material and attach to object
         returnObject->material = parseMaterial(node["material"]);
@@ -135,7 +146,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
             catch(const YAML::KeyNotFound e){
                 scene->setRenderMode(0);
             }
-            
+
             // Read scene configuration options
             scene->setEye(parseTriple(doc["Eye"]));
 

@@ -32,6 +32,7 @@ Color Scene::trace(const Ray &ray)
 
     // No hit? Return background color.
     if (!obj) return Color(0.0, 0.0, 0.0);
+    else cout << "Hit!" << endl;
 
     Material *material = obj->material;            //the hit objects material
     Point hit = ray.at(min_hit.t);                 //the hit point
@@ -101,46 +102,59 @@ Color Scene::traceNormal(const Ray &ray)
     return color;
 }
 
-// Color Scene::traceZbuffer(const Ray &ray)
-// {
-//     // Find hit object and distance
-//     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
-//     Object *obj = NULL;
+Color Scene::traceZbuffer(const Ray &ray)
+{
+    // Find hit object and distance
+    Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
+    Object *obj = NULL;
+    for (unsigned int i = 0; i < objects.size(); ++i) {
+        Hit hit(objects[i]->intersect(ray));
+        if (hit.t<min_hit.t) {
+            min_hit = hit;
+            obj = objects[i];
+        }
+    }
 
-//     int maxDepth;
-//     int minDepth;
+    // No hit? Return background color.
+    if (!obj) return Color(0.0, 0.0, 0.0);
 
-//     if (objects.size() > 0){
-//         maxDepth = objects[0]->position.z;
-//         minDepth = objects[0]->position.z;
-//     }
-
-//     for (unsigned int i = 0; i < objects.size(); ++i) {
-
-//         Hit hit(objects[i]->intersect(ray));
-//         if (hit.t<min_hit.t) {
-//             min_hit = hit;
-//             obj = objects[i];
-//         }
-//     }
-
-//     // No hit? Return background color.
-//     if (!obj) return Color(0.0, 0.0, 0.0);
-
-//     Material *material = obj->material;            //the hit objects material
-//     Point hit = ray.at(min_hit.t);                 //the hit point
-//     Vector N = min_hit.N;                          //the normal at hit point
-//     Vector V = -ray.D;                             //the view vector
+    Material *material = obj->material;            //the hit objects material
+    Point hit = ray.at(min_hit.t);                 //the hit point
+    Vector N = min_hit.N;                          //the normal at hit point
+    Vector V = -ray.D;                             //the view vector
 
 
-//     Color color;
-//     if (maxDepth == minDepth)
-//         color = Color(1);
-//     else
-//         color = Color((1 / (maxDepth - minDepth)) * (pos.z - minDepth));
+    /****************************************************
+    * This is where you should insert the color
+    * calculation (Phong model).
+    *
+    * Given: material, hit, N, V, lights[]
+    * Sought: color
+    *
+    * Hints: (see triple.h)
+    *        Triple.dot(Vector) dot product
+    *        Vector+Vector      vector sum
+    *        Vector-Vector      vector difference
+    *        Point-Point        yields vector
+    *        Vector.normalize() normalizes vector, returns length
+    *        double*Color        scales each color component (r,g,b)
+    *        Color*Color        dito
+    *        pow(a,b)           a to the power of b
+    ****************************************************/
 
-//     return color;
-// }
+    Color color = material->ka * material->color;
+
+    for (unsigned int i = 0; i < lights.size(); i++){
+        Vector L = lights[i]->position - hit;
+        L.normalize();
+        
+        Vector H=(V+L).normalized();
+
+        color += material->kd *material->color* lights[i]->color * std::max(0.0, N.dot(L))+material->ks*lights[i]->color* pow(std::max(0.0, N.dot(H)),material->n*2);
+    }
+
+    return color;
+}
 
 void Scene::render(Image &img)
 {
@@ -152,13 +166,13 @@ void Scene::render(Image &img)
             Ray ray(eye, (pixel-eye).normalized());
 
             Color col;
-            if (renderMode == 0)
+            if (renderMode == 0) // Phong
                 col = trace(ray);
             else {
-                if (renderMode == 1)
-                    col = trace(ray);
+                if (renderMode == 1) // z-buffer
+                    col = traceZbuffer(ray);
 
-                else col = traceNormal(ray);
+                else col = traceNormal(ray); // normal
             }
             col.clamp();
             img(x,y) = col;
