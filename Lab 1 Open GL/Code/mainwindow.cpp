@@ -157,9 +157,20 @@ void MainWindow::render()
     view.setToIdentity();
     projection.setToIdentity();
 
-    view.perspective(60.0, 1, 4, 5);
+    view.perspective(60.0, 1, 2, 6);
+    model.translate(4, 0, 0);
     
     glDrawArrays(GL_TRIANGLES, 0, nVertices);
+
+    GLuint mUniform, vUniform, pUniform;
+
+    mUniform = m_shaderProgram->uniformLocation("m");
+    vUniform = m_shaderProgram->uniformLocation("v");
+    pUniform = m_shaderProgram->uniformLocation("p");
+
+    m_shaderProgram->setUniformValue(mUniform, model);
+    m_shaderProgram->setUniformValue(vUniform, view);
+    m_shaderProgram->setUniformValue(pUniform, projection);
 
     // OpenGl assignment 1, part 2:
     // To render the scene from the raytracer:
@@ -169,7 +180,6 @@ void MainWindow::render()
     // (You should be able to see the dark side of the scene when rotation)
 
     // renderRaytracerScene()
-
 
     // relases the current shaderprogram (to bind an use another shaderprogram for example)
     m_shaderProgram->release();
