@@ -46,10 +46,12 @@ private:
     void renderSphere(QVector3D pos, QVector3D color, QVector4D material, QVector3D lightpos);
     void renderRaytracerScene();
     int nVertices;
-    QOpenGLVertexArrayObject
+    QMatrix4x4 model, view, projection;
 
     // Declare your VAO and VBO variables here
-
+	QOpenGLVertexArrayObject object;
+	QOpenGLBuffer *coordinates;
+	QOpenGLBuffer *colors_buffer;
 
     // Members for the shader and uniform variables
     QOpenGLShaderProgram *m_shaderProgram;

@@ -19,9 +19,12 @@ MainWindow::~MainWindow()
     // Free all your used resources here
 
     // Destroy buffers first, before destroying the VertexArrayObject
+    object.destroy();
 
     // free the pointer of the shading program
     delete m_shaderProgram;
+    delete colors_buffer;
+    delete coordinates;
 
 }
 
@@ -58,8 +61,27 @@ void MainWindow::initialize()
     }
 
     // Create your Vertex Array Object (VAO) and Vertex Buffer Objects (VBO) here.
+    object.create();
+    object.bind();
+    
+    coordinates = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    coordinates->create();
+    coordinates->bind();
 
-
+	coordinates->allocate(vertices.data(), vertices.length() * sizeof(vertices[0]));
+	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
+	
+	colors_buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+	colors_buffer->create();
+    colors_buffer->bind();
+    
+    colors_buffer->allocate(colors.data(), colors.length() * sizeof(colors[0]));
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,0);
+    
+    for (int index = 0; index < cube.indices.length(); index++)
+		glEnableVertexAttribArray(index);
+		
+	object.release();
 
     // Set OpenGL to use Filled triangles (can be used to render points, or lines)
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -126,11 +148,26 @@ void MainWindow::render()
 
     // Bind the shaderprogram to use it
     m_shaderProgram->bind();
-
+    object.bind();
+    
     // Rendering can be done here
     // Any transformation you whish to do or setting a uniform
     // should be done before any call to glDraw*
-
+    for (int i = 0; i < 4; i++){
+		for (int j = 0; j < 4; j++)
+			if (i == j){
+				model[i][j] = 1;
+				view[i][j] = 1;
+				projection[i][j] = 1;
+			}
+			else {
+				model[i][j] = 0;
+				view[i][j] = 0;
+				projection[i][j] = 0;
+			}		
+	}	
+    
+    glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
     // OpenGl assignment 1, part 2:
     // To render the scene from the raytracer:
