@@ -153,19 +153,11 @@ void MainWindow::render()
     // Rendering can be done here
     // Any transformation you whish to do or setting a uniform
     // should be done before any call to glDraw*
-    for (int i = 0; i < 4; i++){
-		for (int j = 0; j < 4; j++)
-			if (i == j){
-				model[i][j] = 1;
-				view[i][j] = 1;
-				projection[i][j] = 1;
-			}
-			else {
-				model[i][j] = 0;
-				view[i][j] = 0;
-				projection[i][j] = 0;
-			}		
-	}	
+    model.setToIdentity();
+    view.setToIdentity();
+    projection.setToIdentity();
+
+    view.perspective(60.0, 1, 4, 5);
     
     glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
