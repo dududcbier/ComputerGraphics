@@ -47,6 +47,7 @@ private:
     void renderRaytracerScene();
     int nVertices;
     QMatrix4x4 model, view, projection;
+    int xMouse, yMouse; // Mouse position
 
     // Declare your VAO and VBO variables here
 	QOpenGLVertexArrayObject object;

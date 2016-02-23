@@ -58,6 +58,8 @@ void MainWindow::initialize()
     for (int i = 0; i < cube.indices.length(); i += 3){
         QVector3D c = QVector3D((double) rand() / RAND_MAX, (double) rand() / RAND_MAX, (double) rand() / RAND_MAX);
         colors.append(c);
+        colors.append(c);
+        colors.append(c);
     }
 
     // Create your Vertex Array Object (VAO) and Vertex Buffer Objects (VBO) here.
@@ -68,14 +70,14 @@ void MainWindow::initialize()
     coordinates->create();
     coordinates->bind();
 
-	coordinates->allocate(vertices.data(), vertices.length() * sizeof(vertices[0]));
+    coordinates->allocate(vertices.data(), vertices.length() * sizeof(QVector3D));
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 	
 	colors_buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	colors_buffer->create();
     colors_buffer->bind();
     
-    colors_buffer->allocate(colors.data(), colors.length() * sizeof(colors[0]));
+    colors_buffer->allocate(colors.data(), colors.length() * sizeof(QVector3D));
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,0);
     
     for (int index = 0; index < cube.indices.length(); index++)
@@ -234,6 +236,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent *ev)
 void MainWindow::mousePressEvent(QMouseEvent *ev)
 {
     qDebug() << "Mouse button pressed:" << ev->button();
+    xMouse = ev->x();
+    yMouse = ev->y();
 
     renderLater();
 }
