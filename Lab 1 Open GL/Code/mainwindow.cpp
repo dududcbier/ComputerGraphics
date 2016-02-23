@@ -157,20 +157,14 @@ void MainWindow::render()
     view.setToIdentity();
     projection.setToIdentity();
 
-    view.perspective(60.0, 1, 2, 6);
-    model.translate(4, 0, 0);
-    
+    view.perspective(60.0, 1, 0.1, 2000);
+    model.translate(0, 0, -4);
+
+    m_shaderProgram->setUniformValue("m", model);
+    m_shaderProgram->setUniformValue("v", view);
+    m_shaderProgram->setUniformValue("p", projection);
+
     glDrawArrays(GL_TRIANGLES, 0, nVertices);
-
-    GLuint mUniform, vUniform, pUniform;
-
-    mUniform = m_shaderProgram->uniformLocation("m");
-    vUniform = m_shaderProgram->uniformLocation("v");
-    pUniform = m_shaderProgram->uniformLocation("p");
-
-    m_shaderProgram->setUniformValue(mUniform, model);
-    m_shaderProgram->setUniformValue(vUniform, view);
-    m_shaderProgram->setUniformValue(pUniform, projection);
 
     // OpenGl assignment 1, part 2:
     // To render the scene from the raytracer:
