@@ -72,6 +72,26 @@ int parseRenderMode(const YAML::Node& node)
     return 0;
 }
 
+int parseShadow(const YAML::Node& node)
+{
+
+    std::string s = "";
+    node.GetScalar(s);
+
+    if (s == "true") {
+        cout << "Shadows: True" << endl; 
+        return 1;
+    }
+
+    if (s == "false") {
+        cout << "Shadows: False" << endl; 
+        return 0; 
+    }
+	
+	cout << "Shadows: True" << endl; 
+	return 1;
+}
+
 Material* Raytracer::parseMaterial(const YAML::Node& node)
 {
     Material *m = new Material();
@@ -161,6 +181,14 @@ bool Raytracer::readScene(const std::string& inputFilename)
             }
             catch(const YAML::KeyNotFound e){
                 scene->setRenderMode(0);
+            }
+            
+            //Shadows 
+            try {
+                scene->setShadow(parseShadow(doc["Shadows"]));
+            }
+            catch(const YAML::KeyNotFound e){
+                scene->setShadow(1);
             }
 
             // Read scene configuration options

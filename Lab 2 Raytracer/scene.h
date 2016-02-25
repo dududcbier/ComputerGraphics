@@ -32,6 +32,8 @@ private:
     int renderMode;
     double maxDepth;
     double minDepth;
+    int shadows;
+    
 public:
     Color trace(const Ray &ray);       // tracer corresponds to the rendering in Phong mode
     Color traceNormal(const Ray &ray); // traceNormal corresponds to the rendering in normal mode
@@ -46,6 +48,7 @@ public:
     unsigned int getNumLights() { return lights.size(); }
     void setMaxDepth(double x);
     void setMinDepth(double x);
+    void setShadow(int s);
 };
 
 #endif /* end of include guard: SCENE_H_KNBLQLP6 */

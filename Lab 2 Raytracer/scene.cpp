@@ -52,7 +52,7 @@ Color Scene::trace(const Ray &ray)
     Object *obj = NULL;
     for (unsigned int i = 0; i < objects.size(); ++i) {
         Hit hit(objects[i]->intersect(ray));
-        if (hit.t<min_hit.t) {
+        if (hit.t < min_hit.t) {
             min_hit = hit;
             obj = objects[i];
         }
@@ -86,15 +86,37 @@ Color Scene::trace(const Ray &ray)
     ****************************************************/
 
     Color color = material->ka * material->color;
-
+	
     for (unsigned int i = 0; i < lights.size(); i++){ // The effect of each light source has to be determined
         Vector L = lights[i]->position - hit;
         L.normalize();
         
+        Ray lightRay(lights[i]->position, L);
+        
+        Hit hitObj(obj->intersect(lightRay));        
+        
+        // Implementation of generating shadows in the scene. If the boolean value shadows is set to 1, 
+        // this piece of code computes whether or not direct light is cast on the object (the case if there
+        // is no earlier intersection). If there is no direct light, said light is not used for further computation.
+        int directLight = 1; 
+        
+		if (shadows) {
+			for (unsigned j = 0; j < objects.size(); j++){
+				Hit hit(objects[j]->intersect(lightRay));
+				if (hit.t > hitObj.t)
+					directLight = 0;
+			}
+		}
+		
+		Vector R = 2 * (N.dot(L) * N) - L;
+        
         Vector H = (V + L).normalized();
-
-        color += material->kd * material->color * lights[i]->color * std::max(0.0, N.dot(L)) + material->ks * lights[i]->color * pow(std::max(0.0, N.dot(H)), material->n * 2); 
+		color += (material->kd * material->color * lights[i]->color * std::max(0.0, N.dot(L))  + material->ks * lights[i]->color * pow(std::max(0.0, R.dot(V)), material->n)) * directLight; 
+				
     }
+    
+    //Vector reflectionVector = 2 * (N.dot(V) * V) - V;
+    //Ray reflection(hit.t * ray.D + ray.O, R);
 
     return color;
 }
@@ -213,4 +235,9 @@ void Scene::setEye(Triple e)
 void Scene::setRenderMode(int r)
 {
     renderMode = r;
+}
+
+void Scene::setShadow(int s)
+{
+    shadows = s;
 }
