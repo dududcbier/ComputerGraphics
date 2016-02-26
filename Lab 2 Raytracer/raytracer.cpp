@@ -92,6 +92,14 @@ int parseShadow(const YAML::Node& node)
 	return 1;
 }
 
+int parseMaxRecursionDepth(const YAML::Node& node){
+
+    int x = node;
+    cout << "MaxRecursionDepth: " << x << endl;
+    return x;
+
+}
+
 Material* Raytracer::parseMaterial(const YAML::Node& node)
 {
     Material *m = new Material();
@@ -189,6 +197,15 @@ bool Raytracer::readScene(const std::string& inputFilename)
             }
             catch(const YAML::KeyNotFound e){
                 scene->setShadow(1);
+            }
+
+            //Max Recursion Depth
+            try {
+                scene->setMaxRecursionDepth(parseMaxRecursionDepth(doc["MaxRecursionDepth"]));
+            }
+            catch(const YAML::KeyNotFound e){
+                cout << "Not found...\n";
+                scene->setMaxRecursionDepth(2);
             }
 
             // Read scene configuration options

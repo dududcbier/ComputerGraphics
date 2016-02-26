@@ -47,6 +47,7 @@ void Scene::minMaxDepth(const Ray &ray){
 
 Color Scene::trace(const Ray &ray)
 {
+
     // Find hit object and distance
     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
     Object *obj = NULL;
@@ -86,6 +87,7 @@ Color Scene::trace(const Ray &ray)
     ****************************************************/
 
     Color color = material->ka * material->color;
+    Vector R;
 	
     for (unsigned int i = 0; i < lights.size(); i++){ // The effect of each light source has to be determined
         Vector L = lights[i]->position - hit;
@@ -102,21 +104,33 @@ Color Scene::trace(const Ray &ray)
         
 		if (shadows) {
 			for (unsigned j = 0; j < objects.size(); j++){
-				Hit hit(objects[j]->intersect(lightRay));
-				if (hit.t > hitObj.t)
+				Hit lightHit(objects[j]->intersect(lightRay));
+				if (lightHit.t > hitObj.t)
 					directLight = 0;
 			}
 		}
 		
-		Vector R = 2 * (N.dot(L) * N) - L;
+		R = 2 * (N.dot(L) * N) - L;
         
-        Vector H = (V + L).normalized();
 		color += (material->kd * material->color * lights[i]->color * std::max(0.0, N.dot(L))  + material->ks * lights[i]->color * pow(std::max(0.0, R.dot(V)), material->n)) * directLight; 
-				
+
     }
-    
-    //Vector reflectionVector = 2 * (N.dot(V) * V) - V;
-    //Ray reflection(hit.t * ray.D + ray.O, R);
+
+    Vector reflectionVector = 2 * (N.dot(V) * N) - V;
+    reflectionVector.normalize();
+
+    Ray reflection(hit, reflectionVector);
+
+    if (recursiveDepth < maxRecursionDepth){
+
+        Vector L = - reflectionVector;
+        
+        R = 2 * (N.dot(L) * N) - L;
+
+        recursiveDepth++;
+        color += material->ks * trace(reflection) * pow(std::max(0.0, R.dot(V)), material->n);
+        recursiveDepth--;
+    }
 
     return color;
 }
@@ -240,4 +254,8 @@ void Scene::setRenderMode(int r)
 void Scene::setShadow(int s)
 {
     shadows = s;
+}
+
+void Scene::setMaxRecursionDepth(int m){
+    maxRecursionDepth = m;
 }
