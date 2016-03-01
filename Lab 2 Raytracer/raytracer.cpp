@@ -114,18 +114,26 @@ Camera parseCamera(const YAML::Node& node){
 	Triple t;
 	
 	cout << "Eye" << endl;
+	node["eye"] >> t;
 	cam.setEye(t);
 	
 	cout << "Center" << endl;
+	node["center"] >> t;
 	cam.setCenter(t);
 	
 	cout << "Up" << endl;
+	node["up"] >> t;
 	cam.setUpVector(t);
 	
-	node["viewSize"] >> t;
-	cam.setWidth(t.x);
-	cam.setHeight(t.y);
+	unsigned int x;
+	node["viewSize"][0] >> x;
+	cam.setWidth(x);
 	
+	unsigned int y;
+	node["viewSize"][1] >> y;
+	cam.setHeight(y);
+	
+	cout << "Done" << endl;
 	return cam;
 }
 
@@ -264,7 +272,8 @@ bool Raytracer::readScene(const std::string& inputFilename)
             }
 
             // Read scene configuration options
-            scene->setEye(parseTriple(doc["Eye"]));
+			// scene->setEye(parseTriple(doc["Eye"]));
+				
 
             // Read and parse the scene objects
             const YAML::Node& sceneObjects = doc["Objects"];
