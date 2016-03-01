@@ -20,6 +20,7 @@
 #include "material.h"
 #include "light.h"
 #include "image.h"
+#include "camera.h"
 #include "yaml/yaml.h"
 #include <ctype.h>
 #include <fstream>
@@ -106,6 +107,26 @@ int parseSuperSampling(const YAML::Node& node){
 	node["factor"] >> x;
 	cout << "SuperSampling factor: " << x << endl;
     return x;
+}
+
+Camera parseCamera(const YAML::Node& node){
+	Camera cam;
+	Triple t;
+	
+	cout << "Eye" << endl;
+	cam.setEye(t);
+	
+	cout << "Center" << endl;
+	cam.setCenter(t);
+	
+	cout << "Up" << endl;
+	cam.setUpVector(t);
+	
+	node["viewSize"] >> t;
+	cam.setWidth(t.x);
+	cam.setHeight(t.y);
+	
+	return cam;
 }
 
 Material* Raytracer::parseMaterial(const YAML::Node& node)
@@ -213,7 +234,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
             }
             catch(const YAML::KeyNotFound e){
                 cout << "Not found...\n";
-                scene->setMaxRecursionDepth(2);
+                scene->setMaxRecursionDepth(0);
             }
             
             // Set super sampling
@@ -223,6 +244,23 @@ bool Raytracer::readScene(const std::string& inputFilename)
             }
             catch(const YAML::KeyNotFound e){
                 scene->setSuperSamplingFactor(1);
+            }
+            
+            // Camera
+            
+            try {
+                scene->setCamera(parseCamera(doc["Camera"]));
+            }
+            catch(const YAML::KeyNotFound e){
+				cout << "No camera defined" << endl;
+				Camera cam;
+				cam.setEye(parseTriple(doc["Eye"]));
+				cam.setCenter(Triple(200,200,0));
+				cam.setUpVector(Triple(0, 1, 0));
+				cam.setHeight(400);
+				cam.setWidth(400);
+				
+				scene->setCamera(cam);
             }
 
             // Read scene configuration options
@@ -268,7 +306,8 @@ bool Raytracer::readScene(const std::string& inputFilename)
 
 void Raytracer::renderToFile(const std::string& outputFilename)
 {
-    Image img(400,400);
+	std::cout << "Width: " << scene->camera.getWidth() << " Height: " << scene->camera.getHeight() << std::endl;
+    Image img(scene->camera.getWidth(),scene->camera.getHeight());
     cout << "Tracing..." << endl;
     scene->render(img);
     cout << "Writing image to " << outputFilename << "..." << endl;

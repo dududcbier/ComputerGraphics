@@ -53,7 +53,7 @@ Color Scene::trace(const Ray &ray)
     Object *obj = NULL;
     for (unsigned int i = 0; i < objects.size(); ++i) {
         Hit hit(objects[i]->intersect(ray));
-        if (hit.t < min_hit.t) {
+        if (hit.t < min_hit.t && hit.t > 0.0) {
             min_hit = hit;
             obj = objects[i];
         }
@@ -119,9 +119,8 @@ Color Scene::trace(const Ray &ray)
     if (recursiveDepth < maxRecursionDepth && material->ks > 0 ){
 		
 		Vector reflectionVector = 2 * (N.dot(V) * N) - V;
-		reflectionVector.normalize();
 
-		Ray reflection(hit, -reflectionVector);
+		Ray reflection(hit, reflectionVector);
 
         recursiveDepth++;
         color += material->ks * trace(reflection);
@@ -200,7 +199,7 @@ void Scene::render(Image &img)
         for (int j = 0; j < h; j++){
 			for (int i = 0; i < w; i++){
 				Point pixel2(i+0.5, h-1-j+0.5, 0);
-                Ray ray2(eye, (pixel2-eye).normalized());
+                Ray ray2(camera.getEye(), (pixel2-camera.getEye()).normalized());
                 minMaxDepth(ray2);
             }
         }
@@ -208,23 +207,28 @@ void Scene::render(Image &img)
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            Point pixel(x+0.5, h-1-y+0.5, 0);
-            Ray ray(eye, (pixel-eye).normalized());
+			Color col;
+			for (int i = 1; i <= sqrt(ssFactor); i++){
+				for (int j = 1; j <= sqrt(ssFactor); j++) {
+					
+					Point pixel(x+ i/(sqrt(ssFactor) + 1), h-1-y+ j/(sqrt(ssFactor) + 1), 0);
+					Ray ray(camera.getEye(), (pixel-camera.getEye()).normalized());
 
-            Color col;
-            if (renderMode == 0) // Phong - this is the default render mode
-				col = trace(ray);
+					if (renderMode == 0) // Phong - this is the default render mode
+						col += trace(ray)/ssFactor;
 			
-            if (renderMode == 1) // z-buffer
-				col = traceZbuffer(ray);
+					if (renderMode == 1) // z-buffer
+						col += traceZbuffer(ray)/ssFactor;;
 				
-            if (renderMode == 2)  
-				col = traceNormal(ray); // normal
-				
-            col.clamp();
-            img(x,y) = col;
+					if (renderMode == 2)  
+						col += traceNormal(ray)/ssFactor;; // normal
+				}
+			}
+			col.clamp();
+			img(x,y) = col;
         }
     }
+    
 }
 
 void Scene::addObject(Object *o)
@@ -258,5 +262,9 @@ void Scene::setMaxRecursionDepth(int m){
 
 void Scene::setSuperSamplingFactor(int ss){
     ssFactor = ss;
+}
+
+void Scene::setCamera(Camera cam) {
+	camera = cam;
 }
 

@@ -22,6 +22,7 @@
 #include "light.h"
 #include "object.h"
 #include "image.h"
+#include "camera.h"
 
 class Scene
 {
@@ -54,6 +55,8 @@ public:
     void setShadow(int s);
     void setMaxRecursionDepth(int m);
     void setSuperSamplingFactor(int ss);
+    void setCamera(Camera cam);
+    Camera camera;
 };
 
 #endif /* end of include guard: SCENE_H_KNBLQLP6 */
