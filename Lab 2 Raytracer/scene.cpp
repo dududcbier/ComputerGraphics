@@ -116,19 +116,15 @@ Color Scene::trace(const Ray &ray)
 
     }
 
-    Vector reflectionVector = 2 * (N.dot(V) * N) - V;
-    reflectionVector.normalize();
+    if (recursiveDepth < maxRecursionDepth && material->ks > 0 ){
+		
+		Vector reflectionVector = 2 * (N.dot(V) * N) - V;
+		reflectionVector.normalize();
 
-    Ray reflection(hit, reflectionVector);
-
-    if (recursiveDepth < maxRecursionDepth){
-
-        Vector L = - reflectionVector;
-        
-        R = 2 * (N.dot(L) * N) - L;
+		Ray reflection(hit, -reflectionVector);
 
         recursiveDepth++;
-        color += material->ks * trace(reflection) * pow(std::max(0.0, R.dot(V)), material->n);
+        color += material->ks * trace(reflection);
         recursiveDepth--;
     }
 
@@ -259,3 +255,8 @@ void Scene::setShadow(int s)
 void Scene::setMaxRecursionDepth(int m){
     maxRecursionDepth = m;
 }
+
+void Scene::setSuperSamplingFactor(int ss){
+    ssFactor = ss;
+}
+

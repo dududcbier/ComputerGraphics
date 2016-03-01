@@ -35,6 +35,7 @@ private:
     int shadows;
     int recursiveDepth;
     int maxRecursionDepth;
+    int ssFactor;
     
 public:
     Color trace(const Ray &ray);       // tracer corresponds to the rendering in Phong mode
@@ -52,6 +53,7 @@ public:
     void setMinDepth(double x);
     void setShadow(int s);
     void setMaxRecursionDepth(int m);
+    void setSuperSamplingFactor(int ss);
 };
 
 #endif /* end of include guard: SCENE_H_KNBLQLP6 */

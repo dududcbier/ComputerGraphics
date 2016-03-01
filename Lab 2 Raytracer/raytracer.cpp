@@ -100,6 +100,14 @@ int parseMaxRecursionDepth(const YAML::Node& node){
 
 }
 
+int parseSuperSampling(const YAML::Node& node){
+	
+	int x;
+	node["factor"] >> x;
+	cout << "SuperSampling factor: " << x << endl;
+    return x;
+}
+
 Material* Raytracer::parseMaterial(const YAML::Node& node)
 {
     Material *m = new Material();
@@ -206,6 +214,15 @@ bool Raytracer::readScene(const std::string& inputFilename)
             catch(const YAML::KeyNotFound e){
                 cout << "Not found...\n";
                 scene->setMaxRecursionDepth(2);
+            }
+            
+            // Set super sampling
+            
+            try {
+                scene->setSuperSamplingFactor(parseSuperSampling(doc["SuperSampling"]));
+            }
+            catch(const YAML::KeyNotFound e){
+                scene->setSuperSamplingFactor(1);
             }
 
             // Read scene configuration options
