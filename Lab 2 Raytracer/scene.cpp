@@ -204,14 +204,25 @@ void Scene::render(Image &img)
             }
         }
 	}
-
+	
+	Triple gaze = camera.getCenter() - camera.getEye();
+	
+	Triple right = gaze.cross(camera.getUpVector());
+	
+	right.normalize();
+	right *= camera.getUpVector().length();
+	
+	Point topRightCorner = camera.getCenter() + right * camera.getWidth() / 2 + camera.getUpVector() * camera.getHeight() / 2; 
+	
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
 			Color col;
 			for (int i = 1; i <= sqrt(ssFactor); i++){
 				for (int j = 1; j <= sqrt(ssFactor); j++) {
 					
-					Point pixel(x+ i/(sqrt(ssFactor) + 1), h-1-y+ j/(sqrt(ssFactor) + 1), 0);
+					Point p(w - (x+ i/(sqrt(ssFactor)) + 1), h - (h-1-y+ j/(sqrt(ssFactor) + 1)), 0);
+					Point pixel = topRightCorner - camera.getUpVector().length() *p;		
+					
 					Ray ray(camera.getEye(), (pixel-camera.getEye()).normalized());
 
 					if (renderMode == 0) // Phong - this is the default render mode

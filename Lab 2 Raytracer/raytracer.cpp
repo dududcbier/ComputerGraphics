@@ -113,15 +113,12 @@ Camera parseCamera(const YAML::Node& node){
 	Camera cam;
 	Triple t;
 	
-	cout << "Eye" << endl;
 	node["eye"] >> t;
 	cam.setEye(t);
 	
-	cout << "Center" << endl;
 	node["center"] >> t;
 	cam.setCenter(t);
 	
-	cout << "Up" << endl;
 	node["up"] >> t;
 	cam.setUpVector(t);
 	
@@ -133,7 +130,6 @@ Camera parseCamera(const YAML::Node& node){
 	node["viewSize"][1] >> y;
 	cam.setHeight(y);
 	
-	cout << "Done" << endl;
 	return cam;
 }
 
