@@ -67,8 +67,6 @@ Hit Sphere::intersect(const Ray &ray)
 
 	Vector N = (p - position).normalized();
 	
-//	if (t > 0.0)
-		return Hit(t,N);
+	return Hit(t,N);
 		
-	//return Hit::NO_HIT();
 }

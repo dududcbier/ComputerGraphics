@@ -53,7 +53,7 @@ Color Scene::trace(const Ray &ray)
     Object *obj = NULL;
     for (unsigned int i = 0; i < objects.size(); ++i) {
         Hit hit(objects[i]->intersect(ray));
-        if (hit.t < min_hit.t && hit.t > 0.0) {
+        if (hit.t < min_hit.t && hit.t > 0.0) { // If hit.t == 0, then the light source would've hit itself, which is something we don't want, specially for the reflections.
             min_hit = hit;
             obj = objects[i];
         }
@@ -116,11 +116,11 @@ Color Scene::trace(const Ray &ray)
 
     }
 
-    if (recursiveDepth < maxRecursionDepth && material->ks > 0 ){
+    if (recursiveDepth < maxRecursionDepth && material->ks > 0 ){ // Checks whether or not it should go deeper in the recursion
 		
 		Vector reflectionVector = 2 * (N.dot(V) * N) - V;
 
-		Ray reflection(hit, reflectionVector);
+		Ray reflection(hit, reflectionVector); // Shooting a ray from the hit point in the direction of the reflection
 
         recursiveDepth++;
         color += material->ks * trace(reflection);
@@ -205,9 +205,9 @@ void Scene::render(Image &img)
         }
 	}
 	
-	Triple gaze = camera.getCenter() - camera.getEye();
+	Triple gaze = camera.getCenter() - camera.getEye(); // The eye looks at the center
 	
-	Triple right = gaze.cross(camera.getUpVector());
+	Triple right = gaze.cross(camera.getUpVector()); // right vector is perpendicular to the up vector
 	
 	right.normalize();
 	right *= camera.getUpVector().length();
@@ -217,22 +217,26 @@ void Scene::render(Image &img)
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
 			Color col;
+			
+			 // The purpose of these two for loops (below) is so that we can get the SuperSampling done.
+			 // On each iteration the color is altered to get better results in the image.
+			 
 			for (int i = 1; i <= sqrt(ssFactor); i++){
 				for (int j = 1; j <= sqrt(ssFactor); j++) {
 					
 					Point p(w - (x+ i/(sqrt(ssFactor)) + 1), h - (h-1-y+ j/(sqrt(ssFactor) + 1)), 0);
-					Point pixel = topRightCorner - camera.getUpVector().length() *p;		
+					Point pixel = topRightCorner - camera.getUpVector().length() * p;	// The pixels are scaled according to the length of the up vector	
 					
 					Ray ray(camera.getEye(), (pixel-camera.getEye()).normalized());
 
 					if (renderMode == 0) // Phong - this is the default render mode
-						col += trace(ray)/ssFactor;
+						col += trace(ray) / ssFactor;
 			
 					if (renderMode == 1) // z-buffer
-						col += traceZbuffer(ray)/ssFactor;;
+						col += traceZbuffer(ray) / ssFactor;;
 				
 					if (renderMode == 2)  
-						col += traceNormal(ray)/ssFactor;; // normal
+						col += traceNormal(ray) / ssFactor;; // normal
 				}
 			}
 			col.clamp();

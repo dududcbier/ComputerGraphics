@@ -229,7 +229,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
                 scene->setShadow(parseShadow(doc["Shadows"]));
             }
             catch(const YAML::KeyNotFound e){
-                scene->setShadow(1);
+                scene->setShadow(0);
             }
 
             //Max Recursion Depth
@@ -241,7 +241,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
                 scene->setMaxRecursionDepth(0);
             }
             
-            // Set super sampling
+            // Super Sampling
             
             try {
                 scene->setSuperSamplingFactor(parseSuperSampling(doc["SuperSampling"]));
@@ -255,7 +255,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
             try {
                 scene->setCamera(parseCamera(doc["Camera"]));
             }
-            catch(const YAML::KeyNotFound e){
+            catch(const YAML::KeyNotFound e){ // If Camera doesn't exist in the yaml file, then that means Eye must exist. The other values are set to default.
 				cout << "No camera defined" << endl;
 				Camera cam;
 				cam.setEye(parseTriple(doc["Eye"]));

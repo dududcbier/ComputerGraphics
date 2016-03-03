@@ -1,3 +1,5 @@
+// Camera object for the scenes
+
 #ifndef CAMERA_H
 #define CAMERA_H
 
