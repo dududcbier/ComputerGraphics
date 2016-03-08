@@ -26,6 +26,9 @@ MainWindow::~MainWindow()
     delete colors_buffer;
     delete coordinates;
 
+    delete texture_buffer;
+    delete texture;
+
 }
 
 // Initialize all your OpenGL objects here
@@ -50,6 +53,7 @@ void MainWindow::initialize()
     // Initialize your objects and buffers
 
     OBJModel cube = OBJModel(":/models/cube.obj");
+    qDebug() << "Object read";
     QVector<QVector3D> vertices = cube.vertices;
 
     nVertices = vertices.length();
@@ -81,17 +85,28 @@ void MainWindow::initialize()
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,0);
 
      QVector<QVector2D> textureCoordinates;
-    
+
+    qDebug() << "Texture buffer";
+
     texture_buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     texture_buffer->create();
     texture_buffer->bind();
     texture_buffer->allocate(textureCoordinates.data(), textureCoordinates.length() * sizeof(QVector2D));
     glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,0,0);
 
-   // QOpenGLTexture(QOpenGLTexture::Target2D);
+    qDebug() << "Texture";
+
+   texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
+   texture->setWrapMode(QOpenGLTexture::ClampToEdge);
+   texture->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,  QOpenGLTexture::Linear);
+   texture->setData(QImage(QString(":/textures/texture.png")).mirrored());
+
+   qDebug() << "Trying to enable vertexAttrib";
 
     for (int index = 0; index <= 2; index++)
-		glEnableVertexAttribArray(index);
+        glEnableVertexAttribArray(index);
+
+    qDebug() << "Enabled vertexAttrib";
 		
 	object.release();
 
@@ -109,6 +124,8 @@ void MainWindow::initialize()
 
     // Set the clear color to be black (color used for resetting the screen)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    qDebug() << "End of function initialize()";
 }
 
 void MainWindow::renderSphere(QVector3D pos, QVector3D color, QVector4D material, QVector3D lightpos)
@@ -161,6 +178,9 @@ void MainWindow::render()
     // Bind the shaderprogram to use it
     m_shaderProgram->bind();
     object.bind();
+
+    // Bind the texture
+    texture->bind(GL_TEXTURE0);
     
     // Rendering can be done here
     // Any transformation you whish to do or setting a uniform
@@ -189,6 +209,7 @@ void MainWindow::render()
 
     // relases the current shaderprogram (to bind an use another shaderprogram for example)
     m_shaderProgram->release();
+
 
 }
 
