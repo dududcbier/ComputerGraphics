@@ -1,6 +1,6 @@
 #version 330
 // Specify the inputs to the fragment shader
-in vec2 textureCoordinate;
+in vec2 texCoord;
 
 // Specify the Uniforms of the vertex shaders
 uniform sampler2D textureColor;
@@ -12,5 +12,7 @@ out vec4 fColor;
 void main()
 {
     // Plain white
-    fColor = texture2D(textureColor, textureCoordinate);
+
+    fColor = texture2D(textureColor, texCoord);
+    //fColor = texture2D(textureColor, vec2(0.5, 0.5));
 }

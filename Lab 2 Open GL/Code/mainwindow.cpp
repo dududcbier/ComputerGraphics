@@ -3,6 +3,10 @@
 #include <iostream>
 #include <QDebug>
 #include <QScreen>
+#include <math.h>
+#include <QTimer>
+
+#define PI 3.14159265
 
 MainWindow::MainWindow()
     : m_shaderProgram(0)
@@ -34,6 +38,9 @@ MainWindow::~MainWindow()
 // Initialize all your OpenGL objects here
 void MainWindow::initialize()
 {
+    rotate = false;
+    t = 0;
+
     qDebug() << "MainWindow::initialize()";
     QString glVersion;
     glVersion = reinterpret_cast<const char*>(glGetString(GL_VERSION));
@@ -52,14 +59,17 @@ void MainWindow::initialize()
 
     // Initialize your objects and buffers
 
-    OBJModel cube = OBJModel(":/models/cube.obj");
+    //OBJModel cube = OBJModel(":/models/cube.obj");
+
+    OBJModel sphere = OBJModel(":/models/sphere.obj");
     qDebug() << "Object read";
-    QVector<QVector3D> vertices = cube.vertices;
+    QVector<QVector3D> vertices = sphere.vertices;
+    QVector<QVector2D> textureCoordinates = sphere.texcoords;
 
     nVertices = vertices.length();
 
     QVector<QVector3D> colors;
-    for (int i = 0; i < cube.indices.length(); i += 3){
+    for (int i = 0; i < sphere.indices.length(); i += 3){
         QVector3D c = QVector3D((double) rand() / RAND_MAX, (double) rand() / RAND_MAX, (double) rand() / RAND_MAX);
         colors.append(c);
         colors.append(c);
@@ -84,7 +94,12 @@ void MainWindow::initialize()
     colors_buffer->allocate(colors.data(), colors.length() * sizeof(QVector3D));
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,0);
 
-    QVector<QVector2D> textureCoordinates;
+    qDebug() << "Texture";
+
+   texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
+   texture->setWrapMode(QOpenGLTexture::ClampToEdge);
+   texture->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,  QOpenGLTexture::Linear);
+   texture->setData(QImage(QString(":/textures/texture.png")).mirrored());
 
     qDebug() << "Texture buffer";
 
@@ -93,13 +108,6 @@ void MainWindow::initialize()
     texture_buffer->bind();
     texture_buffer->allocate(textureCoordinates.data(), textureCoordinates.length() * sizeof(QVector2D));
     glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,0,0);
-
-    qDebug() << "Texture";
-
-   texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
-   texture->setWrapMode(QOpenGLTexture::ClampToEdge);
-   texture->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,  QOpenGLTexture::Linear);
-   texture->setData(QImage(QString(":/textures/texture.png")).mirrored());
 
    qDebug() << "Trying to enable vertexAttrib";
 
@@ -125,19 +133,28 @@ void MainWindow::initialize()
     // Set the clear color to be black (color used for resetting the screen)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    model.setToIdentity();
+
+    projection.perspective(90.0, (float)width()/height(), 50, 2000);
+    view.translate(-100,-100, -1300);
+
     qDebug() << "End of function initialize()";
 }
 
 void MainWindow::renderSphere(QVector3D pos, QVector3D color, QVector4D material, QVector3D lightpos)
 {
+    model.setToIdentity();
+    model.translate(pos);
+    //m_shaderProgram->setUniformValue("lightpos", lightpos);
+    // m_shaderProgram->setUniformValue("materialColor", color);
+
+    //model.setColumn(3,QVector4D(pos,1));
+    // m_shaderProgram->setUniformValue("intensity", material);
+    m_shaderProgram->setUniformValue("m", model);
+
     // OpenGL assignment 1, part 2: create a function to render the sphere
     // Use OBJModel(":/models/spehere.obj") for the model
-
-    // you must remove these Q_UNUSED when you implement this function
-    Q_UNUSED(pos)
-    Q_UNUSED(color)
-    Q_UNUSED(material)
-    Q_UNUSED(lightpos)
+    glDrawArrays(GL_TRIANGLES, 0, nVertices);
 }
 
 /**
@@ -146,7 +163,7 @@ void MainWindow::renderSphere(QVector3D pos, QVector3D color, QVector4D material
  */
 void MainWindow::renderRaytracerScene()
 {
-    QVector3D lightpos = QVector3D(-200,600,1500);
+    QVector3D lightpos = QVector3D(-200,1200,1500);
 
     // Blue sphere
     renderSphere(QVector3D(90,320,100),QVector3D(0,0,1),QVector4D(0.2f,0.7f,0.5f,64),lightpos);
@@ -184,19 +201,12 @@ void MainWindow::render()
     
     // Rendering can be done here
     // Any transformation you whish to do or setting a uniform
-    // should be done before any call to glDraw*
-    model.setToIdentity();
-    view.setToIdentity();
-    projection.setToIdentity();
+    // should be done before any call to glDraw
 
-    view.perspective(60.0, (float)width()/height(), 1.0, 2000);
-    model.translate(0, 0, -4);
-
-    m_shaderProgram->setUniformValue("m", model);
     m_shaderProgram->setUniformValue("v", view);
     m_shaderProgram->setUniformValue("p", projection);
 
-    glDrawArrays(GL_TRIANGLES, 0, nVertices);
+    //glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
     // OpenGl assignment 1, part 2:
     // To render the scene from the raytracer:
@@ -205,13 +215,59 @@ void MainWindow::render()
     // Make sure that the light position is fixed relative to the world.
     // (You should be able to see the dark side of the scene when rotation)
 
-    // renderRaytracerScene()
+    //renderRaytracerScene();
+
+    renderAnimatedScene();
 
     // relases the current shaderprogram (to bind an use another shaderprogram for example)
     m_shaderProgram->release();
+}
 
+void MainWindow::startAnimatedScene() {
+   QTimer *timer = new QTimer(this);
+   connect(timer, SIGNAL(timeout()), this, SLOT(&MainWindow::renderAnimatedScene()));
+   timer->start();
+}
+
+void MainWindow::renderAnimatedScene()
+{
+
+    // Sun
+        renderPlanet(0, 1, 0, QVector3D(145, 160, 300), 2.9);
+
+    // Planet 1
+        renderPlanet(300, 2, 1.8, QVector3D(145, 160, 300), .5);
+    // Planet 2
+        renderPlanet(400, 4, 1.4, QVector3D(145, 160, 300), 0.9);
+
+    // Planet 3
+        renderPlanet(600, 3, 1.1, QVector3D(145, 160, 300), 1.3);
+
+    // Planet 4
+        renderPlanet(820, 5, 0.4, QVector3D(145, 160, 300), 1.6);
+    t++;
+    renderLater();
+}
+void MainWindow::renderPlanet(float centerDistance, float speedArroundSelf, float speedAroundCenter, QVector3D originalPos, float size){
+
+    model.setToIdentity();
+
+    qreal deltaX = centerDistance * cos(t * speedAroundCenter * PI / 180) + originalPos.x();
+    qreal deltaY = centerDistance * sin(t * speedAroundCenter * PI / 180) + originalPos.y();
+
+    model.translate(deltaX, deltaY, originalPos.z());
+    model.rotate(t * speedArroundSelf, 0, 0 ,1);
+
+    model.scale(size);
+
+    m_shaderProgram->setUniformValue("m", model);
+
+    // OpenGL assignment 1, part 2: create a function to render the sphere
+    // Use OBJModel(":/models/spehere.obj") for the model
+    glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
 }
+
 
 
 // Below are functions which are triggered by input events:
@@ -256,19 +312,27 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *ev)
 // Triggered when moving the mouse inside the window (even when no mouse button is clicked!)
 void MainWindow::mouseMoveEvent(QMouseEvent *ev)
 {
-    //qDebug() << ev->button();
-    //renderLater();
+    //alowing a user to rotate
+    if (rotate){
 
-    // you must remove the Q_UNUSED when you implement this function
-    Q_UNUSED(ev)
+        std::cout << "(" << lastX << ", " << lastY << ") ->" << "(" << ev->x() << ", " << ev->y() << ")" << std::endl;
+        model.rotate(ev->x() - lastX, 1, 0, 0);
+        model.rotate(ev->y() - lastY, 0, 1, 0);
+        lastX = ev->x();
+        lastY = ev->y();
+
+        renderLater();
+    }
 }
 
 // Triggered when pressing any mouse button
 void MainWindow::mousePressEvent(QMouseEvent *ev)
 {
     qDebug() << "Mouse button pressed:" << ev->button();
-    xMouse = ev->x();
-    yMouse = ev->y();
+    lastX = ev->x();
+    lastY = ev->y();
+
+    rotate = true;
 
     renderLater();
 }
@@ -277,6 +341,7 @@ void MainWindow::mousePressEvent(QMouseEvent *ev)
 void MainWindow::mouseReleaseEvent(QMouseEvent *ev)
 {
     qDebug() << "Mouse button released" << ev->button();
+    rotate = false;
 
     renderLater();
 }
@@ -284,6 +349,10 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *ev)
 // Triggered when clicking scrolling with the scroll wheel on the mouse
 void MainWindow::wheelEvent(QWheelEvent * ev)
 {
-    // Implement something
+    // allowing a user to zoom
     qDebug() << "Mouse wheel:" << ev->delta();
+    if (ev->delta()>0)
+        model.scale(1.2);
+    else model.scale(0.9);
+     renderLater();
 }

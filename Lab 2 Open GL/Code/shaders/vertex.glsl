@@ -2,8 +2,8 @@
 // Specify the input locations of attributes
 layout(location=0) in vec3 posAttr;     // vertex position
 layout(location=1) in vec3 colAttr;     // vertex color color
-layout(location=2) in vec3 normalAttr;  // vertex normal
-layout(location=3) in vec2 textureCoords;
+//layout(location=2) in vec3 normalAttr;  // vertex normal
+layout(location=2) in vec2 texAttr;
 
 // Specify the Uniforms of the vertex shaders
 uniform mat4 m;
@@ -22,5 +22,5 @@ void main()
     gl_Position = vec4(posAttr,1.0);
     gl_Position = p * v * m * gl_Position;
 
-    texCoord = textureCoords;
+    texCoord= texAttr;
 }

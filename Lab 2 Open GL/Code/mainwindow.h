@@ -10,6 +10,8 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
+#include <QTimer>
+
 // Math includes
 #include <QVector2D>
 #include <QVector3D>
@@ -25,6 +27,7 @@
  */
 class MainWindow : public OpenGLWindow
 {
+
 public:
     MainWindow();
     ~MainWindow();
@@ -48,7 +51,9 @@ private:
     void renderRaytracerScene();
     int nVertices;
     QMatrix4x4 model, view, projection;
-    int xMouse, yMouse; // Mouse position
+    int lastX, lastY; // Mouse position
+    unsigned int t;
+    bool rotate;
 
     // Declare your VAO and VBO variables here
 	QOpenGLVertexArrayObject object;
@@ -61,6 +66,14 @@ private:
     // Declare other private variables here if you need them
     QOpenGLBuffer *texture_buffer;
     QOpenGLTexture *texture;
+
+    // Animation functions
+    void startAnimatedScene();
+    void renderPlanet(float centerDistance, float speedArroundSelf, float speedAroundCenter, QVector3D originalPos, float size);
+
+public slots:
+    void renderAnimatedScene();
+
 };
 
 #endif // MAINWINDOW_H
