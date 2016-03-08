@@ -20,7 +20,7 @@ void main()
     // gl_Position is the output of the vertex shader
     // Currently without any transformation
     gl_Position = vec4(posAttr,1.0);
-    gl_Position = m * v * p * gl_Position;
+    gl_Position = p * v * m * gl_Position;
 
     texCoord = textureCoords;
 }

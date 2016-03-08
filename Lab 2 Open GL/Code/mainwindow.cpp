@@ -84,7 +84,7 @@ void MainWindow::initialize()
     colors_buffer->allocate(colors.data(), colors.length() * sizeof(QVector3D));
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,0);
 
-     QVector<QVector2D> textureCoordinates;
+    QVector<QVector2D> textureCoordinates;
 
     qDebug() << "Texture buffer";
 
@@ -189,7 +189,7 @@ void MainWindow::render()
     view.setToIdentity();
     projection.setToIdentity();
 
-    view.perspective(60.0, 1, 0.1, 2000);
+    view.perspective(60.0, (float)width()/height(), 1.0, 2000);
     model.translate(0, 0, -4);
 
     m_shaderProgram->setUniformValue("m", model);
