@@ -80,6 +80,8 @@ void MainWindow::initialize()
     object.create();
     object.bind();
     
+    // Coordinates
+
     coordinates = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     coordinates->create();
     coordinates->bind();
@@ -87,34 +89,37 @@ void MainWindow::initialize()
     coordinates->allocate(vertices.data(), vertices.length() * sizeof(QVector3D));
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 	
+    // Color Buffer
+
 	colors_buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	colors_buffer->create();
     colors_buffer->bind();
-    
+
     colors_buffer->allocate(colors.data(), colors.length() * sizeof(QVector3D));
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,0);
 
-    qDebug() << "Texture";
-
-   texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
-   texture->setWrapMode(QOpenGLTexture::ClampToEdge);
-   texture->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,  QOpenGLTexture::Linear);
-   texture->setData(QImage(QString(":/textures/texture.png")).mirrored());
-
-    qDebug() << "Texture buffer";
+    // Texture Buffer
 
     texture_buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     texture_buffer->create();
     texture_buffer->bind();
+
     texture_buffer->allocate(textureCoordinates.data(), textureCoordinates.length() * sizeof(QVector2D));
     glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,0,0);
 
-   qDebug() << "Trying to enable vertexAttrib";
+    // Enabling all vertex attrib
+    // Note that the normal buffer was not created on this version
+    // and therefore doesn't need to be enabled
 
     for (int index = 0; index <= 2; index++)
         glEnableVertexAttribArray(index);
 
-    qDebug() << "Enabled vertexAttrib";
+    // Texture
+
+    texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    texture->setWrapMode(QOpenGLTexture::ClampToEdge);
+    texture->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,  QOpenGLTexture::Linear);
+    texture->setData(QImage(QString(":/textures/texture.png")).mirrored());
 		
 	object.release();
 
@@ -145,6 +150,8 @@ void MainWindow::renderSphere(QVector3D pos, QVector3D color, QVector4D material
 {
     model.setToIdentity();
     model.translate(pos);
+
+    // Phong Shading was not implemented correctly and was disabled in this assignment
     //m_shaderProgram->setUniformValue("lightpos", lightpos);
     // m_shaderProgram->setUniformValue("materialColor", color);
 
@@ -202,7 +209,6 @@ void MainWindow::render()
     // Rendering can be done here
     // Any transformation you whish to do or setting a uniform
     // should be done before any call to glDraw
-
     m_shaderProgram->setUniformValue("v", view);
     m_shaderProgram->setUniformValue("p", projection);
 
@@ -223,28 +229,24 @@ void MainWindow::render()
     m_shaderProgram->release();
 }
 
-void MainWindow::startAnimatedScene() {
-   QTimer *timer = new QTimer(this);
-   connect(timer, SIGNAL(timeout()), this, SLOT(&MainWindow::renderAnimatedScene()));
-   timer->start();
-}
-
 void MainWindow::renderAnimatedScene()
 {
 
     // Sun
-        renderPlanet(0, 1, 0, QVector3D(145, 160, 300), 2.9);
+    renderPlanet(0, 1, 0, QVector3D(145, 160, 300), 2.9);
 
     // Planet 1
-        renderPlanet(300, 2, 1.8, QVector3D(145, 160, 300), .5);
+    renderPlanet(300, 2, 1.8, QVector3D(145, 160, 300), .5);
+
     // Planet 2
-        renderPlanet(400, 4, 1.4, QVector3D(145, 160, 300), 0.9);
+    renderPlanet(400, 4, 1.4, QVector3D(145, 160, 300), 0.9);
 
     // Planet 3
-        renderPlanet(600, 3, 1.1, QVector3D(145, 160, 300), 1.3);
+    renderPlanet(600, 3, 1.1, QVector3D(145, 160, 300), 1.3);
 
     // Planet 4
-        renderPlanet(820, 5, 0.4, QVector3D(145, 160, 300), 1.6);
+    renderPlanet(820, 5, 0.4, QVector3D(145, 160, 300), 1.6);
+    
     t++;
     renderLater();
 }
@@ -252,18 +254,22 @@ void MainWindow::renderPlanet(float centerDistance, float speedArroundSelf, floa
 
     model.setToIdentity();
 
+    // Using x = r * cos(a) + x_0 and y = r * sin(a) + y_0
+    // Angles are in radians
     qreal deltaX = centerDistance * cos(t * speedAroundCenter * PI / 180) + originalPos.x();
     qreal deltaY = centerDistance * sin(t * speedAroundCenter * PI / 180) + originalPos.y();
 
+    // Moving around the sun
     model.translate(deltaX, deltaY, originalPos.z());
+
+    // Moving around itself
     model.rotate(t * speedArroundSelf, 0, 0 ,1);
 
+    // Sizing the planet
     model.scale(size);
 
     m_shaderProgram->setUniformValue("m", model);
 
-    // OpenGL assignment 1, part 2: create a function to render the sphere
-    // Use OBJModel(":/models/spehere.obj") for the model
     glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
 }

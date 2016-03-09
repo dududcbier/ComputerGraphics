@@ -68,10 +68,7 @@ private:
     QOpenGLTexture *texture;
 
     // Animation functions
-    void startAnimatedScene();
     void renderPlanet(float centerDistance, float speedArroundSelf, float speedAroundCenter, QVector3D originalPos, float size);
-
-public slots:
     void renderAnimatedScene();
 
 };
