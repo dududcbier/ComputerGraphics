@@ -25,6 +25,7 @@ public:
     Plane(Point p, Vector v1, Vector v2) : p(p), v1(v1), v2(v2) { }
 
     virtual Hit intersect(const Ray &ray);
+    virtual Color textureColor(Point p);
 
     const Point p;
     const Vector v1;

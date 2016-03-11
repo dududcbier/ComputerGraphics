@@ -10,7 +10,7 @@ raytracer.o: raytracer.cpp raytracer.h triple.h light.h scene.h object.h \
  yaml/iterator.h yaml/noncopyable.h yaml/parserstate.h yaml/nodeimpl.h \
  yaml/nodeutil.h yaml/nodereadimpl.h yaml/emitter.h yaml/emittermanip.h \
  yaml/ostream.h yaml/stlemitter.h sphere.h triangle.h plane.h material.h
-sphere.o: sphere.cpp sphere.h object.h triple.h hit.h ray.h
+sphere.o: material.cpp material.h image.cpp image.h sphere.cpp sphere.h object.cpp object.h triple.h hit.h ray.h
 plane.o: plane.cpp plane.h object.h triple.h hit.h ray.h
 light.o: light.cpp light.h triple.h
 material.o: material.cpp material.h triple.h

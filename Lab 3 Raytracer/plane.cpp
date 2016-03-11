@@ -25,3 +25,7 @@ Hit Plane::intersect(const Ray &ray)
 
 	return Hit(t,N);
 }
+
+Color Plane::textureColor(Point p) {
+	return Object::textureColor(p);
+}

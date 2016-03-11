@@ -26,6 +26,8 @@ public:
 
     virtual Hit intersect(const Ray &ray);
 
+    virtual Color textureColor(Point p);
+
     const Point p1;
     const Point p2;
     const Point p3;

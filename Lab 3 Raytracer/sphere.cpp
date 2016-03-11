@@ -73,16 +73,17 @@ Hit Sphere::intersect(const Ray &ray)
 		
 }
 
-Triple Sphere::textureColor(Triple p) {
+Color Sphere::textureColor(Point p) {
 		
 	double theta = acos((p.z - position.z) / r);
 	double phi = atan2(p.y - position.y, p.x - position.x);
 	
-	Triple texCoord;
+	if (phi < 0)
+		phi += 2 * PI;
 	
-	texCoord.x = phi / (2 * PI);
-	texCoord.y = (PI - theta) / PI;
+	double u = phi / (2 * PI);
+	double v = (PI - theta) / PI;
 	
-	return texCoord;
+	return material->texture->colorAt(u, v);
 	
 }

@@ -135,17 +135,26 @@ Camera parseCamera(const YAML::Node& node){
 
 Material* Raytracer::parseMaterial(const YAML::Node& node)
 {
+
     Material *m = new Material();
     
     try {
-		node["texture"] >> m->texture;
+        std::string textureName;
+		node["texture"] >> textureName;
+        m->texture = new Image(textureName.c_str());
 	}
 	
 	catch(const YAML::KeyNotFound e){
-		m->texture = "";
+		m->texture = NULL;
 	}
 	
-    node["color"] >> m->color;	
+    try { 
+        node["color"] >> m->color;
+    }
+
+    catch(const YAML::KeyNotFound e){
+        m->color = Color(0, 0, 0);
+    }
     node["ka"] >> m->ka;
     node["kd"] >> m->kd;
     node["ks"] >> m->ks;
@@ -282,6 +291,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
                 cerr << "Error: expected a sequence of objects." << endl;
                 return false;
             }
+
             for(YAML::Iterator it=sceneObjects.begin();it!=sceneObjects.end();++it) {
                 Object *obj = parseObject(*it);
                 // Only add object if it is recognized

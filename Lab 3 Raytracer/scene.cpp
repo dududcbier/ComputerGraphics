@@ -88,14 +88,10 @@ Color Scene::trace(const Ray &ray)
 	
 	Color color;
 	
-	if (material->texture == "")
-		color = material->ka * material->color;
-		
-	else {
-		Image *texture = new Image(material->texture.c_str());
-		Triple texCoord = obj->toTextureCoordinates(hit);
-		color = texture->colorAt(texCoord.x, texCoord.y);
-	}
+	if (material->texture == NULL)
+		color = material->ka * material->color;	
+	else 
+		color = obj->textureColor(hit);
 	
     Vector R;
 	

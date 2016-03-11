@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include "triple.h"
+#include "image.h"
 
 class Material
 {
@@ -26,7 +27,7 @@ public:
     double kd;          // diffuse intensity
     double ks;          // specular intensity 
     double n;           // exponent for specular highlight size
-    std::string texture;     // name of the texture file
+    Image *texture;     // texture image
 
     Material() { }
 };
