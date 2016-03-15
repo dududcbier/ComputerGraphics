@@ -76,14 +76,29 @@ Hit Sphere::intersect(const Ray &ray)
 
 Color Sphere::textureColor(Point p) {
 
-	// Triple rot = r * rVec.normalized();
-	// double a = acos(rot.dot(Triple(0,0,1)) / rot.length());
+	// Triple a = r * rVec.normalized();
+	// Triple b = Triple(1, 0, 0);
 
-	// p.x = p.x * cos(a) + (1 - cos(a)) * (position.x * position.x * p.x + position.x * position.y * p.y + position.x * position.z * p.z) + (position.y * p.z - position.z * p.y) * sin(a);
-	// p.y = p.y * cos(a) + (1 - cos(a)) * (position.y * position.x * p.x + position.y * position.y * p.y + position.y * position.z * p.z) + (position.z * p.x - position.x * p.z) * sin(a);
-	// p.z = p.z * cos(a) + (1 - cos(a)) * (position.z * position.x * p.x + position.z * position.y * p.y + position.z * position.z * p.z) + (position.x * p.y - position.y * p.x) * sin(a);
+	// Triple axis = a.cross(b);
+	// axis /= axis.length();
+	// double ang = acos(a.dot(b) / a.length());
+
+	// double c1 = axis.x;
+	// double c2 = axis.y;
+	// double c3 = axis.z;
+
+	// double origX = p.x;
+	// double origY = p.y;
+	// double origZ = p.z;
+
+	// p.x = origX * cos(ang) + (1 - cos(ang)) * (c1 * c1 * origX + c1 * c2 * origY + c1 * c3 * origZ) + (c2 * origZ - c3 * origY) * sin(ang);
+	// p.y = origY * cos(ang) + (1 - cos(ang)) * (c2 * c1 * origX + c2 * c2 * origY + c2 * c3 * origZ) + (c3 * origX - c1 * origZ) * sin(ang);
+	// p.z = origZ * cos(ang) + (1 - cos(ang)) * (c3 * c1 * origX + c3 * c2 * origY + c3 * c3 * origZ) + (c1 * origY - c2 * origX) * sin(ang);
+
+	// cout << "(" << p.x << ", " << p.y << ", " << p.z << ")" << endl;
 
 	double theta = acos((p.z - position.z) / r);
+	//cout << "Theta: " << theta << " [" << (p.z - c3) / r << "]" << endl;
 	double phi = atan2(p.y - position.y, p.x - position.x);
 
 	phi -= angle * PI / 180;
@@ -93,6 +108,8 @@ Color Sphere::textureColor(Point p) {
 	
 	double u = phi / (2 * PI);
 	double v = (PI - theta) / PI;
+
+	// cout << "(" << u << ", " << v << ")" << endl; 
 	
 	assert(u >= 0 && u <= 1);
 	assert(v >= 0 && v <= 1);
