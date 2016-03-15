@@ -36,10 +36,10 @@ private:
     int recursiveDepth;
     int maxRecursionDepth;
     int ssFactor;
-    int b;
-    int y;
-    int beta;
-    int alpha;
+    double b;
+    double y;
+    double beta;
+    double alpha;
     
 public:
     Color trace(const Ray &ray);       // tracer corresponds to the rendering in Phong mode

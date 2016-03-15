@@ -148,7 +148,7 @@ void Raytracer::parseGoochParameters(const YAML::Node& node){
     }
 
     catch(YAML::KeyNotFound e){
-        scene->setB(0.5);
+        scene->setB(0.4);
     }
 
     try {
@@ -156,7 +156,7 @@ void Raytracer::parseGoochParameters(const YAML::Node& node){
         scene->setY(x);
     }
     catch(YAML::KeyNotFound e){
-        scene->setY(0.5);
+        scene->setY(0.4);
     }
 
     try {
@@ -164,7 +164,7 @@ void Raytracer::parseGoochParameters(const YAML::Node& node){
         scene->setAlpha(x);
     }
     catch(YAML::KeyNotFound e){
-        scene->setAlpha(0.5);
+        scene->setAlpha(0.2);
     }
 
     try {
@@ -172,7 +172,7 @@ void Raytracer::parseGoochParameters(const YAML::Node& node){
         scene->setBeta(x); 
     }
     catch(YAML::KeyNotFound e){
-        scene->setBeta(0.5);
+        scene->setBeta(0.6);
     }   
 }
 

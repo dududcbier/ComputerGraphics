@@ -89,7 +89,7 @@ Color Scene::trace(const Ray &ray)
 	Color color;
 	
 	if (material->texture == NULL)
-		color = material->ka * material->color;	
+		color = Color(0,0,0);	
 	else 
 		color = obj->textureColor(hit);
 	
@@ -122,14 +122,14 @@ Color Scene::trace(const Ray &ray)
 			color += (material->kd * material->color * lights[i]->color * std::max(0.0, N.dot(L))  + material->ks * lights[i]->color * pow(std::max(0.0, R.dot(V)), material->n)) * directLight; //Phong 
 		
 		if (renderMode == 3) {
-			color += (material->kd * lights[i]->color * std::max(0.0, N.dot(L))  + material->ks * lights[i]->color * pow(std::max(0.0, R.dot(V)), material->n)) * directLight;
 			Color k_blue = Color(0, 0, b);
 			Color k_yellow = Color(y, y, 0);
 			Color k_d = lights[i]->color * material->color * material->kd;
 			Color k_cool = k_blue + alpha * k_d;
 			Color k_warm = k_yellow + beta * k_d;
 
-			color += k_cool * (1 - N.dot(L)) / 2 + k_warm * (1 + N.dot(L)) / 2;
+			color += (k_cool * (1 - N.dot(L)) / 2 + k_warm * (1 + N.dot(L)) / 2 + material->ks * lights[i]->color * pow(std::max(0.0, R.dot(V)), material->n)) * directLight;
+
 		}
 	}
 
