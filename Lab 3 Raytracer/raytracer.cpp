@@ -17,6 +17,7 @@
 #include "sphere.h"
 #include "triangle.h"
 #include "plane.h"
+#include "quad.h"
 #include "material.h"
 #include "light.h"
 #include "image.h"
@@ -67,6 +68,11 @@ int parseRenderMode(const YAML::Node& node)
     if (s == "phong") {
         cout << "Render Mode: 0 (Phong)" << endl; 
         return 0; 
+    }
+
+    if (s == "gooch") {
+        cout << "Render Mode: 3 (Gooch)" << endl; 
+        return 3; 
     }
     
     cout << "Render Mode: 0 (Phong)" << endl;
@@ -131,6 +137,43 @@ Camera parseCamera(const YAML::Node& node){
 	cam.setHeight(y);
 	
 	return cam;
+}
+
+void Raytracer::parseGoochParameters(const YAML::Node& node){
+    double x;
+
+    try {
+        node["b"] >> x;
+        scene->setB(x);
+    }
+
+    catch(YAML::KeyNotFound e){
+        scene->setB(0.5);
+    }
+
+    try {
+        node["y"] >> x;
+        scene->setY(x);
+    }
+    catch(YAML::KeyNotFound e){
+        scene->setY(0.5);
+    }
+
+    try {
+        node["alpha"] >> x;
+        scene->setAlpha(x);
+    }
+    catch(YAML::KeyNotFound e){
+        scene->setAlpha(0.5);
+    }
+
+    try {
+        node["beta"] >> x;
+        scene->setBeta(x); 
+    }
+    catch(YAML::KeyNotFound e){
+        scene->setBeta(0.5);
+    }   
 }
 
 Material* Raytracer::parseMaterial(const YAML::Node& node)
@@ -214,6 +257,16 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         returnObject = plane;
     }
 
+    if (objectType == "quad") { // Planes are defined by a point and 2 linearly independent vectors
+        Point p1, p2, p3, p4;
+        node["p1"] >> p1;
+        node["p2"] >> p2;
+        node["p2"] >> p3;
+        node["p3"] >> p4;
+        Quad *quad = new Quad(p1, p2, p3, p4);     
+        returnObject = quad;
+    }
+
     if (returnObject) {
         // read the material and attach to object
         returnObject->material = parseMaterial(node["material"]);
@@ -259,6 +312,10 @@ bool Raytracer::readScene(const std::string& inputFilename)
             catch(const YAML::KeyNotFound e){
                 scene->setRenderMode(0);
             }
+
+            if (scene->renderMode == 3) {
+                parseGoochParameters(doc["GoochParameters"]);
+            }
             
             //Shadows 
             try {
@@ -273,7 +330,6 @@ bool Raytracer::readScene(const std::string& inputFilename)
                 scene->setMaxRecursionDepth(parseMaxRecursionDepth(doc["MaxRecursionDepth"]));
             }
             catch(const YAML::KeyNotFound e){
-                cout << "Not found...\n";
                 scene->setMaxRecursionDepth(0);
             }
             

@@ -79,29 +79,28 @@ Color Sphere::textureColor(Point p) {
 	// Triple a = r * rVec.normalized();
 	// Triple b = Triple(1, 0, 0);
 
-	// Triple axis = a.cross(b);
-	// axis /= axis.length();
-	// double ang = acos(a.dot(b) / a.length());
+	Triple axis = rVec;
+	double ang = angle * PI / 180;
 
-	// double c1 = axis.x;
-	// double c2 = axis.y;
-	// double c3 = axis.z;
+	double c1 = axis.x;
+	double c2 = axis.y;
+	double c3 = axis.z;
 
-	// double origX = p.x;
-	// double origY = p.y;
-	// double origZ = p.z;
+	double origX = p.x;
+	double origY = p.y;
+	double origZ = p.z;
 
-	// p.x = origX * cos(ang) + (1 - cos(ang)) * (c1 * c1 * origX + c1 * c2 * origY + c1 * c3 * origZ) + (c2 * origZ - c3 * origY) * sin(ang);
-	// p.y = origY * cos(ang) + (1 - cos(ang)) * (c2 * c1 * origX + c2 * c2 * origY + c2 * c3 * origZ) + (c3 * origX - c1 * origZ) * sin(ang);
-	// p.z = origZ * cos(ang) + (1 - cos(ang)) * (c3 * c1 * origX + c3 * c2 * origY + c3 * c3 * origZ) + (c1 * origY - c2 * origX) * sin(ang);
+	p.x = origX * cos(ang) + (1 - cos(ang)) * (c1 * c1 * origX + c1 * c2 * origY + c1 * c3 * origZ) + (c2 * origZ - c3 * origY) * sin(ang);
+	p.y = origY * cos(ang) + (1 - cos(ang)) * (c2 * c1 * origX + c2 * c2 * origY + c2 * c3 * origZ) + (c3 * origX - c1 * origZ) * sin(ang);
+	p.z = origZ * cos(ang) + (1 - cos(ang)) * (c3 * c1 * origX + c3 * c2 * origY + c3 * c3 * origZ) + (c1 * origY - c2 * origX) * sin(ang);
 
-	// cout << "(" << p.x << ", " << p.y << ", " << p.z << ")" << endl;
+	cout << "(" << p.x << ", " << p.y << ", " << p.z << ")" << endl;
 
 	double theta = acos((p.z - position.z) / r);
 	//cout << "Theta: " << theta << " [" << (p.z - c3) / r << "]" << endl;
 	double phi = atan2(p.y - position.y, p.x - position.x);
 
-	phi -= angle * PI / 180;
+	// phi -= angle * PI / 180;
 
 	if (phi < 0)
 		phi += 2 * PI;

@@ -30,18 +30,22 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
-    int renderMode;
     double maxDepth;
     double minDepth;
     int shadows;
     int recursiveDepth;
     int maxRecursionDepth;
     int ssFactor;
+    int b;
+    int y;
+    int beta;
+    int alpha;
     
 public:
     Color trace(const Ray &ray);       // tracer corresponds to the rendering in Phong mode
     Color traceNormal(const Ray &ray); // traceNormal corresponds to the rendering in normal mode
     Color traceZbuffer(const Ray &ray);  // traceZbuffer corresponds to the rendering in zbuffer mode
+    Color traceGooch(const Ray &ray);  // traceGooch corresponds to the rendering in Gooch mode
     void render(Image &img);
     void addObject(Object *o);
     void addLight(Light *l);
@@ -56,7 +60,13 @@ public:
     void setMaxRecursionDepth(int m);
     void setSuperSamplingFactor(int ss);
     void setCamera(Camera cam);
+    void setY(double x);
+    void setB(double x);
+    void setBeta(double x);
+    void setAlpha(double x);
+
     Camera camera;
+    int renderMode;
 };
 
 #endif /* end of include guard: SCENE_H_KNBLQLP6 */
