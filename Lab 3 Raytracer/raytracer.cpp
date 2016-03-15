@@ -26,6 +26,8 @@
 #include <ctype.h>
 #include <fstream>
 #include <assert.h>
+#include <regex>
+#include "glm.h"
 
 
 // Functions to ease reading from YAML input
@@ -293,108 +295,124 @@ bool Raytracer::readScene(const std::string& inputFilename)
     // Initialize a new scene
     scene = new Scene();
 
-    // Open file stream for reading and have the YAML module parse it
-    std::ifstream fin(inputFilename.c_str());
-    if (!fin) {
-        cerr << "Error: unable to open " << inputFilename << " for reading." << endl;;
-        return false;
-    }
-    try {
-        YAML::Parser parser(fin);
-        if (parser) {
-            YAML::Node doc;
-            parser.GetNextDocument(doc);
+    regex yamlRegex(".*yaml");
+    regex objRegex(".*obj");
 
-            // RenderMode
-            try {
-                scene->setRenderMode(parseRenderMode(doc["RenderMode"]));
-            }
-            catch(const YAML::KeyNotFound e){
-                scene->setRenderMode(0);
-            }
+    if (regex_match(inputFilename, yamlRegex)){
 
-            if (scene->renderMode == 3) {
-                parseGoochParameters(doc["GoochParameters"]);
-            }
-            
-            //Shadows 
-            try {
-                scene->setShadow(parseShadow(doc["Shadows"]));
-            }
-            catch(const YAML::KeyNotFound e){
-                scene->setShadow(0);
-            }
+        // Open file stream for reading and have the YAML module parse it
+        std::ifstream fin(inputFilename.c_str());
+        if (!fin) {
+            cerr << "Error: unable to open " << inputFilename << " for reading." << endl;;
+            return false;
+        }
+        try {
+            YAML::Parser parser(fin);
+            if (parser) {
+                YAML::Node doc;
+                parser.GetNextDocument(doc);
 
-            //Max Recursion Depth
-            try {
-                scene->setMaxRecursionDepth(parseMaxRecursionDepth(doc["MaxRecursionDepth"]));
-            }
-            catch(const YAML::KeyNotFound e){
-                scene->setMaxRecursionDepth(0);
-            }
-            
-            // Super Sampling
-            
-            try {
-                scene->setSuperSamplingFactor(parseSuperSampling(doc["SuperSampling"]));
-            }
-            catch(const YAML::KeyNotFound e){
-                scene->setSuperSamplingFactor(1);
-            }
-            
-            // Camera
-            
-            try {
-                scene->setCamera(parseCamera(doc["Camera"]));
-            }
-            catch(const YAML::KeyNotFound e){ // If Camera doesn't exist in the yaml file, then that means Eye must exist. The other values are set to default.
-				cout << "No camera defined" << endl;
-				Camera cam;
-				cam.setEye(parseTriple(doc["Eye"]));
-				cam.setCenter(Triple(200,200,0));
-				cam.setUpVector(Triple(0, 1, 0));
-				cam.setHeight(400);
-				cam.setWidth(400);
-				
-				scene->setCamera(cam);
-            }				
+                // RenderMode
+                try {
+                    scene->setRenderMode(parseRenderMode(doc["RenderMode"]));
+                }
+                catch(const YAML::KeyNotFound e){
+                    scene->setRenderMode(0);
+                }
 
-            // Read and parse the scene objects
-            const YAML::Node& sceneObjects = doc["Objects"];
-            if (sceneObjects.GetType() != YAML::CT_SEQUENCE) {
-                cerr << "Error: expected a sequence of objects." << endl;
-                return false;
-            }
+                if (scene->renderMode == 3) {
+                    parseGoochParameters(doc["GoochParameters"]);
+                }
+                
+                //Shadows 
+                try {
+                    scene->setShadow(parseShadow(doc["Shadows"]));
+                }
+                catch(const YAML::KeyNotFound e){
+                    scene->setShadow(0);
+                }
 
-            for(YAML::Iterator it=sceneObjects.begin();it!=sceneObjects.end();++it) {
-                Object *obj = parseObject(*it);
-                // Only add object if it is recognized
-                if (obj) {
-                    scene->addObject(obj);
-                } else {
-                    cerr << "Warning: found object of unknown type, ignored." << endl;
+                //Max Recursion Depth
+                try {
+                    scene->setMaxRecursionDepth(parseMaxRecursionDepth(doc["MaxRecursionDepth"]));
+                }
+                catch(const YAML::KeyNotFound e){
+                    scene->setMaxRecursionDepth(0);
+                }
+                
+                // Super Sampling
+                
+                try {
+                    scene->setSuperSamplingFactor(parseSuperSampling(doc["SuperSampling"]));
+                }
+                catch(const YAML::KeyNotFound e){
+                    scene->setSuperSamplingFactor(1);
+                }
+                
+                // Camera
+                
+                try {
+                    scene->setCamera(parseCamera(doc["Camera"]));
+                }
+                catch(const YAML::KeyNotFound e){ // If Camera doesn't exist in the yaml file, then that means Eye must exist. The other values are set to default.
+    				cout << "No camera defined" << endl;
+    				Camera cam;
+    				cam.setEye(parseTriple(doc["Eye"]));
+    				cam.setCenter(Triple(200,200,0));
+    				cam.setUpVector(Triple(0, 1, 0));
+    				cam.setHeight(400);
+    				cam.setWidth(400);
+    				
+    				scene->setCamera(cam);
+                }				
+
+                // Read and parse the scene objects
+                const YAML::Node& sceneObjects = doc["Objects"];
+                if (sceneObjects.GetType() != YAML::CT_SEQUENCE) {
+                    cerr << "Error: expected a sequence of objects." << endl;
+                    return false;
+                }
+
+                for(YAML::Iterator it=sceneObjects.begin();it!=sceneObjects.end();++it) {
+                    Object *obj = parseObject(*it);
+                    // Only add object if it is recognized
+                    if (obj) {
+                        scene->addObject(obj);
+                    } else {
+                        cerr << "Warning: found object of unknown type, ignored." << endl;
+                    }
+                }
+
+                // Read and parse light definitions
+                const YAML::Node& sceneLights = doc["Lights"];
+                if (sceneObjects.GetType() != YAML::CT_SEQUENCE) {
+                    cerr << "Error: expected a sequence of lights." << endl;
+                    return false;
+                }
+                for(YAML::Iterator it=sceneLights.begin();it!=sceneLights.end();++it) {
+                    scene->addLight(parseLight(*it));
                 }
             }
+            if (parser) {
+                cerr << "Warning: unexpected YAML document, ignored." << endl;
+            }
+        } catch(YAML::ParserException& e) {
+            std::cerr << "Error at line " << e.mark.line + 1 << ", col " << e.mark.column + 1 << ": " << e.msg << std::endl;
+            return false;
+        }
 
-            // Read and parse light definitions
-            const YAML::Node& sceneLights = doc["Lights"];
-            if (sceneObjects.GetType() != YAML::CT_SEQUENCE) {
-                cerr << "Error: expected a sequence of lights." << endl;
-                return false;
-            }
-            for(YAML::Iterator it=sceneLights.begin();it!=sceneLights.end();++it) {
-                scene->addLight(parseLight(*it));
-            }
-        }
-        if (parser) {
-            cerr << "Warning: unexpected YAML document, ignored." << endl;
-        }
-    } catch(YAML::ParserException& e) {
-        std::cerr << "Error at line " << e.mark.line + 1 << ", col " << e.mark.column + 1 << ": " << e.msg << std::endl;
-        return false;
+        cout << "YAML parsing results: " << scene->getNumObjects() << " objects read." << endl;
     }
 
-    cout << "YAML parsing results: " << scene->getNumObjects() << " objects read." << endl;
+    if (regex_match(inputFilename, objRegex)){
+        std::string s = inputFilename;
+        GLMmodel *model = glmReadOBJ(const_cast<char *>(inputFilename.c_str()));
+
+        // for (int i = 0; i < model->numtriangles; i++){
+            
+        // }
+    }
+
     return true;
 }
 

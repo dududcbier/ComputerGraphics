@@ -1,4 +1,4 @@
-#ifndef GML_H_
+#ifndef GLM_H_
 #define GLM_H_
 
 /*    
