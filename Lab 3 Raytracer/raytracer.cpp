@@ -171,9 +171,27 @@ Object* Raytracer::parseObject(const YAML::Node& node)
     if (objectType == "sphere") {
         Point pos;
         node["position"] >> pos;
+
+        double angle;
+        try {
+            node["angle"] >> angle;
+        }
+        catch (const YAML::KeyNotFound e){
+            angle = 0;
+        }
+
         double r;
-        node["radius"] >> r;
-        Sphere *sphere = new Sphere(pos,r);		
+        Triple rVec;
+        try {
+            node["radius"] >> r;
+            rVec = Triple(0,0,0);
+        }
+        catch (const YAML::InvalidScalar e) {
+            node["radius"][0] >> r;
+            rVec = parseTriple(node["radius"][1]);
+        }
+
+        Sphere *sphere = new Sphere(pos,r,angle,rVec);		
         returnObject = sphere;
     }
 

@@ -22,7 +22,7 @@
 class Sphere : public Object
 {
 public:
-    Sphere(Point position,double r) : position(position), r(r) { }
+    Sphere(Point position,double r, double angle = 0, Point rVec = Point(0, 0, 0)) : position(position), r(r), angle(angle), rVec(rVec) { }
 
     virtual Hit intersect(const Ray &ray);
 
@@ -30,6 +30,8 @@ public:
 
     const Point position;
     const double r;
+    const double angle;
+    const Point rVec;
 };
 
 #endif /* end of include guard: SPHERE_H_115209AE */

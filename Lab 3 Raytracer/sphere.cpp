@@ -17,6 +17,7 @@
 #include "sphere.h"
 #include <iostream>
 #include <math.h>
+#include <assert.h>
 
 #define PI 3.141592653589793
 
@@ -74,16 +75,28 @@ Hit Sphere::intersect(const Ray &ray)
 }
 
 Color Sphere::textureColor(Point p) {
-		
+
+	// Triple rot = r * rVec.normalized();
+	// double a = acos(rot.dot(Triple(0,0,1)) / rot.length());
+
+	// p.x = p.x * cos(a) + (1 - cos(a)) * (position.x * position.x * p.x + position.x * position.y * p.y + position.x * position.z * p.z) + (position.y * p.z - position.z * p.y) * sin(a);
+	// p.y = p.y * cos(a) + (1 - cos(a)) * (position.y * position.x * p.x + position.y * position.y * p.y + position.y * position.z * p.z) + (position.z * p.x - position.x * p.z) * sin(a);
+	// p.z = p.z * cos(a) + (1 - cos(a)) * (position.z * position.x * p.x + position.z * position.y * p.y + position.z * position.z * p.z) + (position.x * p.y - position.y * p.x) * sin(a);
+
 	double theta = acos((p.z - position.z) / r);
 	double phi = atan2(p.y - position.y, p.x - position.x);
-	
+
+	phi -= angle * PI / 180;
+
 	if (phi < 0)
 		phi += 2 * PI;
 	
 	double u = phi / (2 * PI);
 	double v = (PI - theta) / PI;
 	
+	assert(u >= 0 && u <= 1);
+	assert(v >= 0 && v <= 1);
+
 	return material->texture->colorAt(u, v);
 	
 }

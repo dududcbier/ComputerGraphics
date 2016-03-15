@@ -55,7 +55,7 @@ Objects:
     n: 32
 - type: sphere
   position: [140,220,400]
-  radius: 50
+  radius: [50,[0,1,0.7]]
   angle: 90
   material:
     texture: earthmap1k.png
