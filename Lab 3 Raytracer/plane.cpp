@@ -16,7 +16,7 @@ Hit Plane::intersect(const Ray &ray)
 	****************************************************/
 	
 	double denominator = ray.D.dot(N);
-	if (denominator == 0)
+	if (denominator > 0)
 		return Hit::NO_HIT(); // no intersection
 		
 	double t = N.dot(p - ray.O) / denominator; 

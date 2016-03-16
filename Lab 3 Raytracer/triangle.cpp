@@ -41,13 +41,13 @@ Hit Triangle::intersect(const Ray &ray)
 
 	double gamma = (i * (ak_jb) + h * (jc_al) + g * (bl_kc)) / M;
 
-	if (gamma < 0 || gamma > 1) {
+	if (gamma < 0.0 || gamma > 1.0) {
 		return Hit::NO_HIT();
 	}
 
 	double beta  = (j * (ei_hf) + k * (gf_di) + l * (dh_eg)) / M;
 
-	if (beta < 0 || beta > 1 - gamma){
+	if (beta < 0.0 || beta > 1.0 - gamma){
 		return Hit::NO_HIT();
 	}
 
