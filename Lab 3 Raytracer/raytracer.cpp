@@ -282,7 +282,7 @@ Object* Raytracer::parseObject(const YAML::Node& node)
 
         GLMmodel *model = glmReadOBJ(const_cast<char *>(objFilename.c_str()));
 
-        for (int i = 0; i < model->numtriangles; i++){
+        for (unsigned int i = 0; i < model->numtriangles; i++){
             Point vertex1 = getVertex(model, model->triangles[i].vindices[0]);
             Point vertex2 = getVertex(model, model->triangles[i].vindices[1]);
             Point vertex3 = getVertex(model, model->triangles[i].vindices[2]);

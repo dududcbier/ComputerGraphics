@@ -17,6 +17,8 @@
 #include "scene.h"
 #include "material.h"
 
+#define EPS 0.00001
+
 void Scene::setMaxDepth(double x){
 	maxDepth = x;
 }
@@ -53,7 +55,7 @@ Color Scene::trace(const Ray &ray)
 	Object *obj = NULL;
 	for (unsigned int i = 0; i < objects.size(); ++i) {
 		Hit hit(objects[i]->intersect(ray));
-		if (hit.t < min_hit.t && hit.t > 0.0) { // If hit.t == 0, then the light source would've hit itself, which is something we don't want, specially for the reflections.
+		if (hit.t < min_hit.t + EPS && hit.t > EPS) { // If hit.t == 0, then the light source would've hit itself, which is something we don't want, specially for the reflections.
 			min_hit = hit;
 			obj = objects[i];
 		}
