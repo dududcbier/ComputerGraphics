@@ -1,3 +1,65 @@
+--------------------------- Version 3.0 ---------------------------
+The program now supports textures, gooch shading, quads and meshes. As with the 
+previous versions, these are implemented with extra rendering options, which are
+turned off by default.
+
+New render options in this version are:
+
+Texture
+Textures are used to add details and colors to an object in the scene. The used 
+textures should be located in the same folder as the program and should be in the
+.png format. The texture replaces the assigned color of the material and should be
+defined in the material. To define the texture to be used for the material, the file name of the texture should be in the yaml file. An example of a textured sphere:
+
+  type: sphere
+  position: [140,220,400]
+  radius: [50,[0,1,0.7]]
+  angle: 90
+  material:
+    texture: earthmap1k.png
+    ka: 0.2
+    kd: 0.8
+    ks: 0
+    n: 1
+
+Gooch Shading
+When the RenderMode is set to "gooch" in the yaml file,
+
+Quads
+Similar to the other object types, quads are read from the yaml file. Quads are
+defined by 4 (distinct) points in such a way that the edges of the quad are 
+p1 --- p2, p2 --- p3, p3 --- p4 and p4 --- p1. An example of a quad in a yaml file:
+- type: quad
+  p1: [200, 200, 0]
+  p2: [190, 200, 0]
+  p3: [190, 190, 0]
+  p4: [200, 190, 0]
+  material: # green
+    color: [0.0,1.0,0.0]
+    ka: 0.2
+    kd: 0.3
+    ks: 0.5
+    n: 8
+
+Meshes
+Meshes allows the user to import obj files to the scene, allowing for more complex
+images. The reading of theses files is done by the glm library and the objects 
+are "translated" from the glmModel to our own object types. Meshes can also be
+scaled and positioned in the yaml files. Just like the textures, the obj file
+should be located on the same folder as the program and the filename is defined
+in the yaml file.
+Example of a mesh:
+
+- type: mesh
+  position: [110,130,200]
+  filename: sphere.obj
+  scale: 1
+  material: # orange
+    color: [1.0,0.5,0.0]
+    ka: 0.2
+    kd: 0.8
+    ks: 0.5
+    n: 32
 --------------------------- Version 2.0 --------------------------- 
 
 The program now supports shadows (from multiple light sources), reflections,
