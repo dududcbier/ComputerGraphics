@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/fragment.glsl</file>
+        <file>shaders/vertex.glsl</file>
+        <file>models/sphere.obj</file>
+        <file>models/cube.obj</file>
+        <file>textures/texture.png</file>
+    </qresource>
+</RCC>
