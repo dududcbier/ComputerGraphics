@@ -243,12 +243,9 @@ void MainWindow::render()
 
     // Bind the shaderprogram to use it
     m_shaderProgram->bind();
-//    blur_shaderProgram->bind();
+    //blur_shaderProgram->bind();
     object.bind();
     //squareVAO.bind();
-
-    // Bind the texture
-    texture->bind(GL_TEXTURE0);
     
     // Rendering can be done here
     // Any transformation you whish to do or setting a uniform
@@ -256,8 +253,10 @@ void MainWindow::render()
     m_shaderProgram->setUniformValue("v", view);
     m_shaderProgram->setUniformValue("p", projection);
 
-   // blur_shaderProgram->setUniformValue("vertical", false);
-   // blur_shaderProgram->setUniformValue("sampler", );
+    renderRaytracerScene();
+
+    //blur_shaderProgram->setUniformValue("vertical", false);
+    //blur_shaderProgram->setUniformValue("sampler", );
 
     //glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
@@ -274,16 +273,13 @@ void MainWindow::render()
 
     // Bind QOpenGLFramebufferObject 1
     pointerForblur1->bind();
-
-        renderRaytracerScene();
+    pointerForblur1->toImage().save("filename.png");
 
     // Clear buffers
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-     pointerForblur1->toImage().save("filename.png");
+
     pointerForblur1->release();
-     pointerForblur1->toImage().save("filename2.png");
 
 }
 
