@@ -243,9 +243,9 @@ void MainWindow::render()
 
     // Bind the shaderprogram to use it
     m_shaderProgram->bind();
-    blur_shaderProgram->bind();
+//    blur_shaderProgram->bind();
     object.bind();
-    squareVAO.bind();
+    //squareVAO.bind();
 
     // Bind the texture
     texture->bind(GL_TEXTURE0);
@@ -256,6 +256,9 @@ void MainWindow::render()
     m_shaderProgram->setUniformValue("v", view);
     m_shaderProgram->setUniformValue("p", projection);
 
+   // blur_shaderProgram->setUniformValue("vertical", false);
+   // blur_shaderProgram->setUniformValue("sampler", );
+
     //glDrawArrays(GL_TRIANGLES, 0, nVertices);
 
     // OpenGl assignment 1, part 2:
@@ -265,12 +268,23 @@ void MainWindow::render()
     // Make sure that the light position is fixed relative to the world.
     // (You should be able to see the dark side of the scene when rotation)
 
-    //renderRaytracerScene();
-
-    renderAnimatedScene();
-
+    //renderAnimatedScene();
     // relases the current shaderprogram (to bind an use another shaderprogram for example)
     m_shaderProgram->release();
+
+    // Bind QOpenGLFramebufferObject 1
+    pointerForblur1->bind();
+
+        renderRaytracerScene();
+
+    // Clear buffers
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+     pointerForblur1->toImage().save("filename.png");
+    pointerForblur1->release();
+     pointerForblur1->toImage().save("filename2.png");
+
 }
 
 void MainWindow::renderAnimatedScene()
