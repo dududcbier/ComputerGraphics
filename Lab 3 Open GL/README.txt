@@ -1,3 +1,16 @@
+--------------------------------------- Version 3.0 ---------------------------------------------
+This program is supposed to implement blurring of images by rendering a Phong shaded image, writing
+ it to a texture image using a QOpenGLFramebufferObject, processing it in a different shader 
+applying a blur and then rendering the scene again using both the blurred texture and the Pong-shaded 
+scene. The amount of blurring should be dependent on the distance to the camera.
+A bug was encountered while implementing the methods above. (step 10 of the lab assignment pdf) 
+This bug could not be located and making it impossible to continue the implementation with proper 
+feedback.
+
+This program is also supposed to support the implementation of an alternative illumination model 
+(Gooch or Toon shading), adjusting the colours and highlighting the contours of objects in black. 
+The implementation of this has not been done due to time constraints. 
+
 --------------------------------------- Version 2.0 ---------------------------------------------
 
 This program modified in such a way that it can render objects with textures.

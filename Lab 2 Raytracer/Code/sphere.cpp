@@ -18,6 +18,8 @@
 #include <iostream>
 #include <math.h>
 
+#define PI 3.1415926535897
+
 /************************** Sphere **********************************/
 
 Hit Sphere::intersect(const Ray &ray)
